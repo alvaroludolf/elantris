@@ -33,7 +33,7 @@ public class Elantris {
     CommandResolver resolver = new CommandResolver();
 
     World world = new World();
-    PC pc = new PC(world.site(500, 500), Direction.NORTH);
+    PC pc = new PC(world.site(500, 500), Direction.WEST);
 
     screen.draw(world, pc);
     while (sc.hasNext()) {

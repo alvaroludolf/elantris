@@ -18,7 +18,7 @@ public class World {
 
   public Site site(int lat, int lon) {
     if (sites[lat][lon] == null) {
-      sites[lat][lon] = new Site(lat, lon, SiteType.PLAIN);
+      sites[lat][lon] = new Site(this, lat, lon, SiteType.PLAIN);
     }
     return sites[lat][lon];
   }

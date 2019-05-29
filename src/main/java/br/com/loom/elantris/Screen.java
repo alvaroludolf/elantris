@@ -9,9 +9,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.loom.elantris.model.Direction;
 import br.com.loom.elantris.model.PC;
 import br.com.loom.elantris.model.World;
 
@@ -37,33 +39,71 @@ public class Screen {
     for (int y = 0; y < height; y++) {
       breakLine();
       for (int x = 0; x < widith; x++) {
-        if (x > 57 && x < 79 && y > 0 && y < 11) {
+        if (x == 68 && y == 10) {
+          out.print("@");
+        } else if (x == 68 && y == 0 && pc.getDirection() == Direction.NORTH) {
+          out.print("N");
+        } else if (x == 68 && y == 12 && pc.getDirection() == Direction.SOUTH) {
+          out.print("N");
+        } else if (x == 57 && y == 6 && pc.getDirection() == Direction.EAST) {
+          out.print("N");
+        } else if (x == 79 && y == 6 && pc.getDirection() == Direction.WEST) {
+          out.print("N");
+        } else if (x > 57 && x < 79 && y > 0 && y < 11) {
           out.print("░");
         } else {
-          moveRight();
+          moveRight(1);
         }
       }
     }
+    DecimalFormat df = new DecimalFormat("00000");
+    resetCursor();
+    moveDown(12);
+    moveRight(62);
+    out.print(df.format(pc.getSite().getLon()));
+    moveLeft(widith);
+    moveRight(73);
+    out.print(df.format(pc.getSite().getLat()));
 
-    out.print("\n");
+    conclude();
     out.flush();
   }
 
-  protected void moveRight() {
-    out.print("\u001b[1C");
+  protected void moveUp(int n) {
+    out.print("\u001b[" + n + "A");
   }
 
-  protected void breakLine() {
-    out.print("\u001b[1B\u001b[" + widith + "D");
+  protected void moveDown(int n) {
+    out.print("\u001b[" + n + "B");
   }
 
-  protected void resetCursor() {
-    out.print("\u001b[" + (height - 1) + "A");
-    out.print("\u001b[" + widith + "D");
+  protected void moveRight(int n) {
+    out.print("\u001b[" + n + "C");
+  }
+
+  protected void moveLeft(int n) {
+    out.print("\u001b[" + n + "D");
   }
 
   protected void clearScreen() {
     out.print("\u001b[0J");
+  }
+
+  protected void breakLine() {
+    moveDown(1);
+    moveLeft(widith);
+  }
+
+  protected void resetCursor() {
+    moveUp(height - 1);
+    moveLeft(widith);
+  }
+
+  protected void conclude() {
+    moveDown(height - 1);
+    moveLeft(widith);
+    moveUp(1);
+    moveRight(2);
   }
 
   private String readResource(String resourceName) throws IOException, URISyntaxException {
