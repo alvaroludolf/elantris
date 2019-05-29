@@ -35,11 +35,12 @@ public class Elantris {
     World world = new World();
     PC pc = new PC(world.site(500, 500), Direction.NORTH);
 
+    screen.draw(world, pc);
     while (sc.hasNext()) {
-      screen.draw(world, pc);
       cmd = sc.next();
       List<Action> playerActions = resolver.resolve(pc, cmd);
       loop.tick(world, playerActions);
+      screen.draw(world, pc);
     }
   }
 }
