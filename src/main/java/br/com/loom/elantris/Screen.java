@@ -15,9 +15,28 @@ import java.util.Map;
 
 import br.com.loom.elantris.model.Direction;
 import br.com.loom.elantris.model.PC;
+import br.com.loom.elantris.model.Site;
 import br.com.loom.elantris.model.World;
 
 public class Screen {
+
+  public static final String BRIGHT_BLACK = "\u001b[30;1m";
+  public static final String BRIGHT_RED = "\u001b[31;1m";
+  public static final String BRIGHT_GREEN = "\u001b[32;1m";
+  public static final String BRIGHT_YELLOW = "\u001b[33;1m";
+  public static final String BRIGHT_BLUE = "\u001b[34;1m";
+  public static final String BRIGHT_MAGENTA = "\u001b[35;1m";
+  public static final String BRIGHT_CYAN = "\u001b[36;1m";
+  public static final String BRIGHT_WHITE = "\u001b[37;1m";
+  public static final String BLACK = "\u001b[30m";
+  public static final String RED = "\u001b[31m";
+  public static final String GREEN = "\u001b[32m";
+  public static final String YELLOW = "\u001b[33m";
+  public static final String BLUE = "\u001b[34m";
+  public static final String MAGENTA = "\u001b[35m";
+  public static final String CYAN = "\u001b[36m";
+  public static final String WHITE = "\u001b[37m";
+  public static final String RESET = "\u001b[0m";
 
   private PrintWriter out;
   private int height;
@@ -40,7 +59,8 @@ public class Screen {
       breakLine();
       for (int x = 0; x < widith; x++) {
         if (x == 68 && y == 10) {
-          out.print("@");
+          colorChar('@', BRIGHT_YELLOW);
+          ;
         } else if (x == 68 && y == 0 && pc.getDirection() == Direction.NORTH) {
           out.print("N");
         } else if (x == 68 && y == 12 && pc.getDirection() == Direction.SOUTH) {
@@ -50,7 +70,43 @@ public class Screen {
         } else if (x == 79 && y == 6 && pc.getDirection() == Direction.WEST) {
           out.print("N");
         } else if (x > 57 && x < 79 && y > 0 && y < 11) {
-          out.print("░");
+          int forwardDelta = 10 - y;
+          int sidewayDelta = x - 68;
+          Site site = null;
+          switch (pc.getDirection()) {
+          case EAST:
+            site = world.site(pc.getSite().getLat() - sidewayDelta, pc.getSite().getLon() + forwardDelta);
+            break;
+          case NORTH:
+            site = world.site(pc.getSite().getLat() + forwardDelta, pc.getSite().getLon() + sidewayDelta);
+            break;
+          case SOUTH:
+            site = world.site(pc.getSite().getLat() - forwardDelta, pc.getSite().getLon() - sidewayDelta);
+            break;
+          case WEST:
+            site = world.site(pc.getSite().getLat() + sidewayDelta, pc.getSite().getLon() - forwardDelta);
+            break;
+          }
+          if (site.getLat() == 500 && site.getLon() == 500) {
+            colorChar('▒', BRIGHT_WHITE);
+          } else
+            switch (site.getType()) {
+            case FOREST:
+              colorChar('♣', GREEN);
+              break;
+            case HILL:
+              colorChar('∩', BRIGHT_GREEN);
+              break;
+            case MARCH:
+              colorChar('ⁿ', GREEN);
+              break;
+            case MOUNTAIN:
+              colorChar('▲', RED);
+              break;
+            case PLAIN:
+              colorChar('.', BRIGHT_GREEN);
+              break;
+            }
         } else {
           moveRight(1);
         }
@@ -67,6 +123,15 @@ public class Screen {
 
     conclude();
     out.flush();
+  }
+
+  protected void colorChar(char c, String color) {
+    out.print(color + c);
+    colorReset();
+  }
+
+  protected void colorReset() {
+    out.print(RESET);
   }
 
   protected void moveUp(int n) {

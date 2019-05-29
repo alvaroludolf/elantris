@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Site {
-
+  
   private World world;
   private int lat;
   private int lon;
@@ -39,13 +39,13 @@ public class Site {
   public Site siteOpposedAt(Direction direction) {
     switch (direction) {
     case SOUTH:
-      return world.site(lat + 1, lon);
+      return siteAt(Direction.NORTH);
     case EAST:
-      return world.site(lat, lon - 1);
+      return siteAt(Direction.WEST);
     case NORTH:
-      return world.site(lat - 1, lon);
+      return siteAt(Direction.SOUTH);
     case WEST:
-      return world.site(lat, lon + 1);
+      return siteAt(Direction.EAST);
     default:
       return this;
     }

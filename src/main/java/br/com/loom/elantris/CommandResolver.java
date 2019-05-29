@@ -12,11 +12,11 @@ public class CommandResolver {
     LinkedList<Action> actions = new LinkedList<>();
     if ("a".equals(cmd)) {
       actions.add(() -> {
-        actor.lookLeft();
+        actor.turnLeft();
       });
     } else if ("d".equals(cmd)) {
       actions.add(() -> {
-        actor.lookRight();
+        actor.turnRight();
       });
     } else if ("w".equals(cmd)) {
       actions.add(() -> {
@@ -25,6 +25,14 @@ public class CommandResolver {
     } else if ("s".equals(cmd)) {
       actions.add(() -> {
         actor.moveBackward();
+      });
+    } else if ("q".equals(cmd)) {
+      actions.add(() -> {
+        actor.moveLeft();
+      });
+    } else if ("e".equals(cmd)) {
+      actions.add(() -> {
+        actor.moveRight();;
       });
     } else {
     }

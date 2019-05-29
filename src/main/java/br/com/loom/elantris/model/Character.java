@@ -25,6 +25,18 @@ public abstract class Character implements Interactable {
     this.site = to;
   }
 
+  public void moveLeft() {
+    turnLeft();
+    moveForward();
+    turnRight();
+  }
+
+  public void moveRight() {
+    turnRight();
+    moveForward();
+    turnLeft();
+  }
+
   public void moveForward() {
     move(this.site.siteAt(this.direction));
   }
@@ -33,7 +45,7 @@ public abstract class Character implements Interactable {
     move(this.site.siteOpposedAt(this.direction));
   }
 
-  public void lookLeft() {
+  public void turnLeft() {
     switch (direction) {
     case NORTH:
       direction = Direction.WEST;
@@ -49,7 +61,7 @@ public abstract class Character implements Interactable {
     }
   }
 
-  public void lookRight() {
+  public void turnRight() {
     switch (direction) {
     case NORTH:
       direction = Direction.EAST;
