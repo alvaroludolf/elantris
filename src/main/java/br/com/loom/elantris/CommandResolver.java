@@ -13,26 +13,32 @@ public class CommandResolver {
     if ("a".equals(cmd)) {
       actions.add(() -> {
         actor.turnLeft();
+        return true;
       });
     } else if ("d".equals(cmd)) {
       actions.add(() -> {
         actor.turnRight();
+        return true;
       });
     } else if ("w".equals(cmd)) {
       actions.add(() -> {
         actor.moveForward();
+        return true;
       });
     } else if ("s".equals(cmd)) {
       actions.add(() -> {
         actor.moveBackward();
+        return true;
       });
     } else if ("q".equals(cmd)) {
       actions.add(() -> {
         actor.moveLeft();
+        return true;
       });
     } else if ("e".equals(cmd)) {
       actions.add(() -> {
-        actor.moveRight();;
+        actor.moveRight();
+        return true;
       });
     } else {
     }

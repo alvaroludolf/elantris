@@ -41,7 +41,7 @@ public class World {
         if (Math.random() < .5)
           winner = i;
     }
-    if (Math.random() < .05) {
+    if (Math.random() < .1) {
       winner = (int) (Math.random() * SITE_VARIANCE);
     }
     type = SiteType.values()[winner];
@@ -52,13 +52,18 @@ public class World {
     return sites[lat][lon];
   }
 
-  public void tick(List<Action> actions) {
+  public List<Action> requestNpcActions() {
+    List<Action> actions = new LinkedList<>();
     for (NPC npc : npcs) {
       Action[] npcActions = npc.act();
       for (Action action : npcActions) {
         actions.add(action);
       }
     }
+    return actions;
+  }
+  
+  public void tick() {
     time++;
   }
 
