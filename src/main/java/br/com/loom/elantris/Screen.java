@@ -1,17 +1,11 @@
 package br.com.loom.elantris;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import br.com.loom.elantris.model.Direction;
 import br.com.loom.elantris.model.PC;
@@ -41,16 +35,23 @@ public class Screen {
   private PrintWriter out;
   private int height;
   private int width;
-  private Map<String, String[]> resources = new HashMap<>();
   private String[] mainScreen;
   private String[] body;
   private String[] message;
   private String[] help;
 
+  public String[] getMessage() {
+    return message;
+  }
+
+  public String[] getHelp() {
+    return help;
+  }
+
   public Screen(PrintStream out, int height, int width) throws IOException, URISyntaxException {
     this.out = new PrintWriter(out, true, StandardCharsets.UTF_8);
-    this.mainScreen = readResource("main.ans");
-    this.body = readResource("initial.ans");
+    this.mainScreen = TextResourceManager.instance().readResource("main.ans");
+    this.body = TextResourceManager.instance().readResource("initial.ans");
     this.message = new String[2];
     this.help = new String[] { "1 - Create a new player", "2 - Load saved game" };
     this.height = height;
@@ -64,42 +65,38 @@ public class Screen {
       out.print(mainScreen[y]);
       moveLeft(width);
       for (int x = 0; x < width; x++) {
-        if (x > 1 && x < 56 && y > 0 && y < 21) {
-          if (y - 1 < body.length && body[y - 1] != null && x - 2 < body[y - 1].length())
-            colorChar(body[y - 1].charAt(x - 2), WHITE);
-          else
-            moveRight(1);
+        if (x > 1 && x < 56 && y > 0 && y < 21 && y - 1 < body.length) {
+          writeCharacter(x - 2, body[y - 1]);
+//          if (body[y - 1] != null && x - 2 < body[y - 1].length())
+//            colorChar(body[y - 1].charAt(x - 2), WHITE);
+//          else
+//            moveRight(1);
         } else if (x > 1 && x < 79 && y == 22) {
-          writeLine(x, message[0]);
+          writeCharacter(x - 2, message[0]);
         } else if (x > 1 && x < 79 && y == 23) {
-          writeLine(x, message[1]);
+          writeCharacter(x - 2, message[1]);
         } else if (x > 1 && x < 79 && y == 25) {
-          writeLine(x, help[0]);
+          writeCharacter(x - 2, help[0]);
         } else if (x > 1 && x < 79 && y == 26) {
-          writeLine(x, help[1]);
-        } else if (pc != null && world != null) {
-          if (!minimap(world, pc, y, x))
-            moveRight(1);
+          writeCharacter(x - 2, help[1]);
+        } else if (pc != null && pc.complete() && world != null && minimap(world, pc, y, x)) {
+          // NOOP
+        } else {
+          moveRight(1);
         }
       }
     }
-    if (pc != null && world != null) {
+    if (pc != null && pc.complete() && world != null) {
       coordinates(pc);
-    }
-    if (pc == null) {
-      resetCursor();
-      for (int y = 0; y < height; y++) {
-
-      }
     }
 
     conclude();
     out.flush();
   }
 
-  protected void writeLine(int x, String s) {
-    if (s != null && x - 2 < s.length())
-      colorChar(s.charAt(x - 2), WHITE);
+  protected void writeCharacter(int i, String s) {
+    if (s != null && i < s.length())
+      colorChar(s.charAt(i), WHITE);
     else
       moveRight(1);
   }
@@ -215,22 +212,6 @@ public class Screen {
     moveLeft(width);
     moveUp(1);
     moveRight(2);
-  }
-
-  private String[] readResource(String resourceName) throws IOException {
-    String[] resource = resources.get(resourceName);
-    if (resource == null) {
-      try (BufferedReader s = new BufferedReader(
-          new InputStreamReader(Screen.class.getResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
-        List<String> resourceLines = new LinkedList<>();
-        String line;
-        while ((line = s.readLine()) != null)
-          resourceLines.add(line);
-        resource = resourceLines.toArray(new String[resourceLines.size()]);
-        resources.put(resourceName, resource);
-      }
-    }
-    return resource;
   }
 
 }

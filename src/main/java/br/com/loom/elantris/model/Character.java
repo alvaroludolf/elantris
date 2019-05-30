@@ -5,8 +5,7 @@ public abstract class Character implements Interactable {
   protected Site site;
   protected Direction direction;
 
-  public Character(Site site, Direction direction) {
-    super();
+  public void dropAt(Site site, Direction direction) {
     this.site = site;
     this.direction = direction;
   }
