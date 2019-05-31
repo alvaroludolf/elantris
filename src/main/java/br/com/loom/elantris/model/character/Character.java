@@ -1,27 +1,66 @@
-package br.com.loom.elantris.model;
+package br.com.loom.elantris.model.character;
 
-public abstract class Character implements Interactable {
+import java.io.Serializable;
+
+import br.com.loom.elantris.model.Interactable;
+import br.com.loom.elantris.model.site.Site;
+
+public abstract class Character implements Interactable, Serializable {
 
   protected Site site;
   protected Direction direction;
+  protected long xp;
+  protected int hpMax;
+  protected int hp;
+  protected int mpMax;
+  protected int mp;
 
   public void dropAt(Site site, Direction direction) {
     this.site = site;
+    this.site.enter(this);
     this.direction = direction;
-  }
-
-  public Site getSite() {
-    return site;
   }
 
   public Direction getDirection() {
     return direction;
   }
 
+  public int getHp() {
+    return hp;
+  }
+
+  public int getHpMax() {
+    return hpMax;
+  }
+
+  public int getMp() {
+    return mp;
+  }
+
+  public int getMpMax() {
+    return mpMax;
+  }
+
+  public Site getSite() {
+    return site;
+  }
+
+  public long getXp() {
+    return xp;
+  }
+
   public void move(Site to) {
     site.leave(this);
     to.enter(this);
     this.site = to;
+  }
+
+  public void moveBackward() {
+    move(this.site.siteOpposedAt(this.direction));
+  }
+
+  public void moveForward() {
+    move(this.site.siteAt(this.direction));
   }
 
   public void moveLeft() {
@@ -36,12 +75,18 @@ public abstract class Character implements Interactable {
     turnLeft();
   }
 
-  public void moveForward() {
-    move(this.site.siteAt(this.direction));
+  public void setHpMax(int hpMax) {
+    this.hp = hpMax;
+    this.hpMax = hpMax;
   }
 
-  public void moveBackward() {
-    move(this.site.siteOpposedAt(this.direction));
+  public void setMpMax(int mpMax) {
+    this.mp = mpMax;
+    this.mpMax = mpMax;
+  }
+
+  public void setXp(long xp) {
+    this.xp = xp;
   }
 
   public void turnLeft() {

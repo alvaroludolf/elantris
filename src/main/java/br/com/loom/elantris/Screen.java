@@ -7,10 +7,11 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 
-import br.com.loom.elantris.model.Direction;
-import br.com.loom.elantris.model.PC;
-import br.com.loom.elantris.model.Site;
 import br.com.loom.elantris.model.World;
+import br.com.loom.elantris.model.character.Character;
+import br.com.loom.elantris.model.character.Direction;
+import br.com.loom.elantris.model.character.PC;
+import br.com.loom.elantris.model.site.Site;
 
 public class Screen {
 
@@ -52,7 +53,7 @@ public class Screen {
     this.out = new PrintWriter(out, true, StandardCharsets.UTF_8);
     this.mainScreen = TextResourceManager.instance().readResource("main.ans");
     this.body = TextResourceManager.instance().readResource("initial.ans");
-    this.message = new String[2];
+    this.message = new String[3];
     this.help = new String[] { "1 - Create a new player", "2 - Load saved game" };
     this.height = height;
     this.width = width;
@@ -67,18 +68,26 @@ public class Screen {
       for (int x = 0; x < width; x++) {
         if (x > 1 && x < 56 && y > 0 && y < 21 && y - 1 < body.length) {
           writeCharacter(x - 2, body[y - 1]);
-//          if (body[y - 1] != null && x - 2 < body[y - 1].length())
-//            colorChar(body[y - 1].charAt(x - 2), WHITE);
-//          else
-//            moveRight(1);
         } else if (x > 1 && x < 79 && y == 22) {
           writeCharacter(x - 2, message[0]);
         } else if (x > 1 && x < 79 && y == 23) {
           writeCharacter(x - 2, message[1]);
-        } else if (x > 1 && x < 79 && y == 25) {
-          writeCharacter(x - 2, help[0]);
+        } else if (x > 1 && x < 79 && y == 24) {
+          writeCharacter(x - 2, message[2]);
         } else if (x > 1 && x < 79 && y == 26) {
+          writeCharacter(x - 2, help[0]);
+        } else if (x > 1 && x < 79 && y == 27) {
           writeCharacter(x - 2, help[1]);
+        } else if (pc != null && x > 63 && x < 79 && y == 13) {
+          writeCharacter(x - 64, pc.getName());
+        } else if (pc != null && pc.getRace() != null && x > 63 && x < 79 && y == 14) {
+          writeCharacter(x - 64, pc.getRace().name());
+        } else if (pc != null && pc.getClasse() != null && x > 64 && x < 79 && y == 15) {
+          writeCharacter(x - 65, pc.getClasse().name());
+        } else if (pc != null && pc.complete() && x > 61 && x < 79 && y == 16) {
+          writeCharacter(x - 62, pc.getHp() + "/" + pc.getHpMax());
+        } else if (pc != null && pc.complete() && x > 61 && x < 79 && y == 17) {
+          writeCharacter(x - 62, pc.getMp() + "/" + pc.getMpMax());
         } else if (pc != null && pc.complete() && world != null && minimap(world, pc, y, x)) {
           // NOOP
         } else {
@@ -101,7 +110,7 @@ public class Screen {
       moveRight(1);
   }
 
-  protected void coordinates(PC pc) {
+  protected void coordinates(Character pc) {
     DecimalFormat df = new DecimalFormat("00000");
     resetCursor();
     moveDown(12);
@@ -112,7 +121,7 @@ public class Screen {
     out.print(df.format(pc.getSite().getLat()));
   }
 
-  protected boolean minimap(World world, PC pc, int y, int x) {
+  protected boolean minimap(World world, Character pc, int y, int x) {
     if (x == 68 && y == 10) {
       colorChar('@', BRIGHT_YELLOW);
     } else if (x == 68 && y == 0 && pc.getDirection() == Direction.NORTH) {
@@ -143,6 +152,8 @@ public class Screen {
       }
       if (site.getLat() == 500 && site.getLon() == 500) {
         colorChar('▒', BRIGHT_WHITE);
+      } else if (site.hasNpc()) {
+        colorChar('M', BRIGHT_RED);
       } else {
         switch (site.getType()) {
         case FOREST:

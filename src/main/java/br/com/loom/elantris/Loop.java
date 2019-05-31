@@ -8,7 +8,7 @@ import br.com.loom.elantris.model.World;
 public class Loop {
 
   public void tick(World world, List<Action> pcActions) {
-    if (pcActions == null)
+    if (world == null || pcActions == null)
       return;
 
     List<Action> npcActions = world.requestNpcActions();

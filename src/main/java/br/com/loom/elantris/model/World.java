@@ -1,17 +1,47 @@
 package br.com.loom.elantris.model;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class World {
+import br.com.loom.elantris.TextResourceManager;
+import br.com.loom.elantris.model.character.NPC;
+import br.com.loom.elantris.model.site.Site;
+import br.com.loom.elantris.model.site.SiteType;
+
+public class World implements Serializable {
 
   private static final int SITE_VARIANCE = SiteType.values().length;
 
   private long time = 0;
   private Site[][] sites = new Site[1000][1000];
   private List<NPC> npcs = new LinkedList<>();
+  private List<MonsterSpec> specs = new LinkedList<>();
+  int totalChance = 0;
 
-  public World() {
+  public World() throws IOException {
+    String[] monsterList = TextResourceManager.instance().readResource("monsters.txt");
+    for (String monster : monsterList) {
+      if (!monster.startsWith("#")) {
+        MonsterSpec spec = new MonsterSpec(monster);
+        specs.add(spec);
+        totalChance += spec.getChance();
+      }
+    }
+  }
+
+  public void addMonster(Site site) {
+    if (Math.random() < .05) {
+      int monsterRandom = (int) (Math.random() * totalChance);
+      for (MonsterSpec spec : specs) {
+        monsterRandom -= spec.getChance();
+        if (monsterRandom < 0) {
+          NPC npc = new NPC(spec);
+          site.addNpc(npc);
+        }
+      }
+    }
   }
 
   public long getTime() {
@@ -23,6 +53,16 @@ public class World {
     if (!safeSite(lat, lon))
       return null;
 
+    if (sites[lat][lon] == null) {
+      SiteType type = defineSiteType(lat, lon);
+      Site site = new Site(this, lat, lon, type);
+      addMonster(site);
+      sites[lat][lon] = site;
+    }
+    return sites[lat][lon];
+  }
+
+  private SiteType defineSiteType(int lat, int lon) {
     SiteType type;
     Site nearbySite;
     int[] nearby = new int[SITE_VARIANCE];
@@ -45,11 +85,7 @@ public class World {
       winner = (int) (Math.random() * SITE_VARIANCE);
     }
     type = SiteType.values()[winner];
-
-    if (sites[lat][lon] == null) {
-      sites[lat][lon] = new Site(this, lat, lon, type);
-    }
-    return sites[lat][lon];
+    return type;
   }
 
   public List<Action> requestNpcActions() {
@@ -62,7 +98,7 @@ public class World {
     }
     return actions;
   }
-  
+
   public void tick() {
     time++;
   }

@@ -1,0 +1,14 @@
+#Name;Chance;HP;MP;XP;Abilities
+Kobold;500;10;0;100;A
+Goblin;200;15;0;100;A
+Hobgoblin;100;15;0;100;A
+Spider;500;15;0;100;A
+Snake;500;15;0;100;A
+Bear;200;15;0;100;A
+Lion;200;15;0;100;A
+Boar;200;15;0;100;A
+Vulture;200;15;0;100;A
+Skeleton;500;15;0;100;A
+Zombie;200;15;0;100;A
+Ghost;100;15;0;100;A
+Tarrasque;1;15;0;100;A

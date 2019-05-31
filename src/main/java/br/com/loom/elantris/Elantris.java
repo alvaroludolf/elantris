@@ -1,18 +1,15 @@
 package br.com.loom.elantris;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
 import br.com.loom.elantris.model.Action;
-import br.com.loom.elantris.model.PC;
 import br.com.loom.elantris.model.World;
+import br.com.loom.elantris.model.character.Character;
+import br.com.loom.elantris.model.character.PC;
 
 public class Elantris {
-
-  private PC pc;
-  private Screen screen;
-  private Scanner sc;
-  private World world;
 
   public static void main(String[] args) {
 
@@ -31,6 +28,13 @@ public class Elantris {
     }
   }
 
+  private Screen screen;
+  private Scanner sc;
+  private SaveRepository saveRepository = new SaveRepository();
+
+  private PC pc;
+  private World world;
+
   public Elantris(Screen screen, Scanner sc) {
     super();
     this.screen = screen;
@@ -39,27 +43,54 @@ public class Elantris {
 
   public void addMessage(String m) {
     screen.getMessage()[0] = screen.getMessage()[1];
-    screen.getMessage()[1] = m;
+    screen.getMessage()[1] = screen.getMessage()[2];
+    screen.getMessage()[2] = m;
   }
 
-  public PC pc() {
+  public void save() {
+    try {
+      saveRepository.save(this);
+      addMessage("Game SAVED.");
+    } catch (IOException e) {
+      addMessage("Error saving the game");
+      addMessage(e.getMessage());
+    }
+  }
+
+  public void load() {
+    try {
+      saveRepository.load(this);
+      addMessage("Game LOADED.");
+    } catch (IOException e) {
+      addMessage("Error loading the game");
+      addMessage(e.getMessage());
+    }
+  }
+
+  public Character pc() {
     if (pc == null)
       pc = new PC();
     return pc;
   }
 
-  public World world() {
+  public void pc(PC pc) {
+    this.pc = pc;
+  }
+
+  public World world() throws IOException {
     if (world == null)
       world = new World();
     return world;
   }
 
-  private void execute() {
+  public void world(World world) {
+    this.world = world;
+  }
+
+  private void execute() throws IOException {
     String cmd;
     Loop loop = new Loop();
     CommandResolver resolver = new CommandResolver(this);
-
-    world = new World();
 
     screen.draw(world, pc);
     while (sc.hasNext()) {
@@ -69,4 +100,5 @@ public class Elantris {
       screen.draw(world, pc);
     }
   }
+
 }

@@ -1,4 +1,4 @@
-package br.com.loom.elantris.model;
+package br.com.loom.elantris.model.character;
 
 public enum Classe {
   

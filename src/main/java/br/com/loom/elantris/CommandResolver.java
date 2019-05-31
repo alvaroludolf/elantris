@@ -1,13 +1,14 @@
 package br.com.loom.elantris;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import br.com.loom.elantris.model.Action;
-import br.com.loom.elantris.model.Classe;
-import br.com.loom.elantris.model.Direction;
-import br.com.loom.elantris.model.PC;
-import br.com.loom.elantris.model.Race;
+import br.com.loom.elantris.model.character.Classe;
+import br.com.loom.elantris.model.character.Direction;
+import br.com.loom.elantris.model.character.PC;
+import br.com.loom.elantris.model.character.Race;
 
 public class CommandResolver {
 
@@ -18,7 +19,7 @@ public class CommandResolver {
     this.elantris = elantris;
   }
 
-  public List<Action> resolve(PC actor, String cmd) {
+  public List<Action> resolve(PC actor, String cmd) throws IOException {
     LinkedList<Action> actions = new LinkedList<>();
     if (actor != null && actor.complete()) {
       if ("a".equals(cmd)) {
@@ -55,11 +56,11 @@ public class CommandResolver {
         // NOOP
       }
     } else if (actor != null && !actor.complete()) {
-      if (actor.completeness() == 0) {
+      if (actor.getName() == null) {
         actor.setName(cmd);
         elantris.addMessage("What is your character class?");
         elantris.addMessage("1 - Warrior / 2 - Mage / 3 - Priest");
-      } else if (actor.completeness() == 1) {
+      } else if (actor.getClasse() == null) {
         if ("1".equals(cmd)) {
           actor.setClasse(Classe.WARRIOR);
         } else if ("2".equals(cmd)) {
@@ -71,7 +72,7 @@ public class CommandResolver {
         }
         elantris.addMessage("What is your character race?");
         elantris.addMessage("1 - Human / 2 - Elf / 3 - Dwarf");
-      } else if (actor.completeness() == 2) {
+      } else if (actor.getRace() == null) {
         if ("1".equals(cmd)) {
           actor.setRace(Race.HUMAN);
         } else if ("2".equals(cmd)) {
@@ -81,17 +82,17 @@ public class CommandResolver {
         } else {
           return null;
         }
-        actor.setHpMax(100);
-        actor.setMpMax(100);
+        actor.setHpMax(actor.getRace().maxHp());
+        actor.setMpMax(actor.getRace().maxMp());
         actor.dropAt(elantris.world().site(500, 500), Direction.NORTH);
+        elantris.save();
       }
     } else {
       if ("1".equals(cmd)) {
         elantris.pc();
         elantris.addMessage("What is your character name?");
-        elantris.addMessage("");
       } else if ("2".equals(cmd)) {
-        // load save file
+        elantris.load();
       } else {
         // NOOP
       }

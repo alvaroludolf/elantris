@@ -1,4 +1,4 @@
-package br.com.loom.elantris.model;
+package br.com.loom.elantris.model.site;
 
 public enum SiteType {
   
