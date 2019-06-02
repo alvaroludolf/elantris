@@ -8,7 +8,7 @@ public class MonsterSpec implements Serializable {
   private int hp;
   private int mp;
   private int xp;
-  private String abilities;
+  private int attack;
   private int chance;
 
   public MonsterSpec(String spec) {
@@ -18,11 +18,11 @@ public class MonsterSpec implements Serializable {
     this.hp = Integer.parseInt(attr[2]);
     this.mp = Integer.parseInt(attr[3]);
     this.xp = Integer.parseInt(attr[4]);
-    this.abilities = attr[5];
+    this.attack = Integer.parseInt(attr[5]);
   }
 
-  public String getAbilities() {
-    return abilities;
+  public int getAttack() {
+    return attack;
   }
 
   public int getChance() {

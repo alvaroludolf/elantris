@@ -2,12 +2,11 @@ package br.com.loom.elantris.model.character;
 
 public enum Classe {
 
-  WARRIOR(100, 0, 12, 4, 4),
-  MAGE(20, 100, 4, 12, 6),
-  PRIEST(60, 80, 6, 8, 12);
+  WARRIOR(20, -20, 12, 0, 4),
+  MAGE(-20, 20, 4, 12, 6),
+  PRIEST(0, 0, 6, 8, 12);
 
   private int maxHp;
-
   private int maxMp;
   private int attack;
   private int spell;
@@ -22,11 +21,15 @@ public enum Classe {
   }
 
   public int attack() {
-    return attack;
+    return (int) (Math.random() * (attack + 1));
   }
 
   public int heal() {
-    return heal;
+    return heal + (int) (Math.random() * (heal + 1));
+  }
+
+  public int spell() {
+    return (spell / 2) + (int) (Math.random() * (spell + 1));
   }
 
   public int maxHp() {
@@ -35,10 +38,6 @@ public enum Classe {
 
   public int maxMp() {
     return maxMp;
-  }
-
-  public int spell() {
-    return spell;
   }
 
 }

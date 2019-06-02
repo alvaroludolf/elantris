@@ -37,6 +37,8 @@ public class TextResourceManager {
       }
       return resource;
     } catch (IOException | NullPointerException e) {
+      Log.log(e.getMessage());
+      e.printStackTrace(Log.printWriter());
       throw new ResourceNotFoundException(e);
     }
   }

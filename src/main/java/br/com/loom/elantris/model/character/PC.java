@@ -25,23 +25,48 @@ public class PC extends Persona {
     this.race = race;
   }
 
-  public void attack(Persona p) {
-    if (p != null)
-      p.takeDamage(classe.attack());
+  public int attack(Persona p) {
+    if (p != null) {
+      int damage = classe.attack();
+      p.takeDamage(damage);
+      if (p.isDead())
+        xp += p.getXp();
+      return damage;
+    }
+    return 0;
   }
 
-  public void cast(Persona p) {
-    if (p != null)
-      p.takeDamage(classe.spell());
+  public int cast(Persona p) {
+    if (mp >= 5) {
+      setMp(mp - 5);
+      if (p != null) {
+        int damage = classe.spell();
+        p.takeDamage(damage);
+        if (p.isDead())
+          xp += p.getXp();
+        return damage;
+      }
+    }
+    return 0;
   }
 
-  public void heal(Persona p) {
-    if (p != null)
-      p.healDamage(classe.heal());
+  public int rest() {
+    int timeToRest = Math.max(getMpMax() - getMp(), getHpMax() - getHp());
+    setHp(Integer.MAX_VALUE);
+    setMp(Integer.MAX_VALUE);
+    return timeToRest;
   }
 
-  @Override
-  protected void die() {
+  public int heal(Persona p) {
+    if (mp >= 5) {
+      setMp(mp - 5);
+      if (p != null) {
+        int heal = classe.heal();
+        p.healDamage(heal);
+        return heal;
+      }
+    }
+    return 0;
   }
 
 }

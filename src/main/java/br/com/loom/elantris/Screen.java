@@ -38,11 +38,11 @@ public class Screen {
   private int width;
   private String[] body = new String[13];
   private String[] message = new String[3];
-  private String[] help = new String[2];
+  private String[] help = new String[3];
 
   public Screen(PrintStream out, int height, int width) {
     this.out = new PrintWriter(out, true, StandardCharsets.UTF_8);
-    setHelp("1 - Create a new player", "2 - Load saved game");
+    setHelp(TextResourceManager.instance().readResource("createHelp.ans"));
     this.height = height;
     this.width = width;
   }
@@ -66,14 +66,16 @@ public class Screen {
 
       for (int x = 0; x < width; x++) {
         if (writeAt(x, y, 1, 56, 1, 5, logo)) {
-        } else if (writeAt(x, y, 1, 55, 7, 19, body)) {
-        } else if (writeAt(x, y, 1, 78, 22, 24, message)) {
-        } else if (writeAt(x, y, 1, 78, 26, 27, help)) {
+        } else if (writeAt(x, y, 1, 55, 7, 18, body)) {
+        } else if (writeAt(x, y, 1, 78, 21, 23, message)) {
+        } else if (writeAt(x, y, 1, 78, 25, 27, help)) {
         } else if (pc != null && writeAt(x, y, 63, 78, 13, pc.getName())) {
         } else if (pc != null && pc.getRace() != null && writeAt(x, y, 63, 74, 14, pc.getRace().name())) {
         } else if (pc != null && pc.getClasse() != null && writeAt(x, y, 64, 78, 15, pc.getClasse().name())) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 16, pc.getHp() + "/" + pc.getHpMax())) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 17, pc.getMp() + "/" + pc.getMpMax())) {
+        } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 18, String.valueOf(pc.getXp()))) {
+        } else if (pc != null && pc.complete() && writeAt(x, y, 64, 78, 19, String.valueOf(world.getTime()))) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 61, 67, 11, df.format(pc.getSite().getLon()))) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 72, 78, 11, df.format(pc.getSite().getLat()))) {
         } else if (minimap(world, pc, y, x)) {
@@ -98,6 +100,7 @@ public class Screen {
   public void setHelp(String... h) {
     help[0] = (h.length > 0) ? h[0] : "";
     help[1] = (h.length > 1) ? h[1] : "";
+    help[2] = (h.length > 2) ? h[2] : "";
   }
 
   protected void breakLine() {
@@ -118,7 +121,10 @@ public class Screen {
     int i = 0;
     Site site = pc.getSite();
     body[i++] = "You are in a " + site.getType().shortDescription();
-    body[i++] = "It is a " + pc.getSite().getType().longDescription();
+    String[] descriptions = pc.getSite().getType().longDescription();
+    for (String description : descriptions) {
+      body[i++] = description;
+    }
     i++;
     if (site.hasNpc()) {
       NPC npc = site.getNpc();

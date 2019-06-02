@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import br.com.loom.elantris.Log;
 import br.com.loom.elantris.model.World;
 import br.com.loom.elantris.model.character.Direction;
 import br.com.loom.elantris.model.character.NPC;
@@ -29,6 +30,7 @@ public class Site implements Serializable {
   }
 
   public void enter(Persona persona) {
+    Log.log(persona + " entering " + this);
     chars.add(persona);
     if (persona instanceof PC) {
       for (int i = -3; i < 4; i++) {
@@ -38,6 +40,11 @@ public class Site implements Serializable {
         world.addMonster(world.site(lat + i, lon - 6));
       }
     }
+  }
+
+  public void leave(Persona persona) {
+    Log.log(persona + " leaving " + this);
+    chars.remove(persona);
   }
 
   public int getLat() {
@@ -82,10 +89,6 @@ public class Site implements Serializable {
         return true;
     }
     return false;
-  }
-
-  public void leave(Persona persona) {
-    chars.remove(persona);
   }
 
   public Site siteAt(Direction direction) {

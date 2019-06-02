@@ -6,7 +6,6 @@ import java.util.Scanner;
 import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.World;
 import br.com.loom.elantris.model.character.PC;
-import br.com.loom.elantris.model.character.Persona;
 
 public class Elantris {
 
@@ -52,7 +51,7 @@ public class Elantris {
     try {
       saveRepository.save(this);
       addMessage("Game SAVED.");
-    } catch (IOException e) {
+    } catch (RuntimeException | IOException e) {
       addMessage("Error saving the game");
       addMessage(e.getMessage());
     }
@@ -62,13 +61,13 @@ public class Elantris {
     try {
       saveRepository.load(this);
       addMessage("Game LOADED.");
-    } catch (IOException e) {
+    } catch (RuntimeException | IOException e) {
       addMessage("Error loading the game");
       addMessage(e.getMessage());
     }
   }
 
-  public Persona pc() {
+  public PC pc() {
     if (pc == null)
       pc = new PC();
     return pc;
@@ -78,7 +77,7 @@ public class Elantris {
     this.pc = pc;
   }
 
-  public World world() throws IOException {
+  public World world() {
     if (world == null)
       world = new World();
     return world;
@@ -88,18 +87,22 @@ public class Elantris {
     this.world = world;
   }
 
-  private void execute() throws IOException {
+  public void restart() {
+    pc = null;
+    world = null;
+  }
+
+  public void execute() throws IOException {
     String cmd;
     CommandResolver resolver = new CommandResolver(this);
-    Loop loop = new Loop();
+    Loop loop = new Loop(this);
 
     screen.draw(world, pc);
     while (sc.hasNext()) {
       cmd = sc.next();
       Action playerAction = resolver.resolve(pc, cmd);
-      if (playerAction != null) {
-        loop.tick(world, playerAction);
-      }
+      loop.tick(playerAction);
+
       screen.draw(world, pc);
     }
   }

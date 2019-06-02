@@ -1,60 +1,44 @@
 package br.com.loom.elantris.model.character;
 
-import br.com.loom.elantris.Log;
-import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.MonsterSpec;
 
 public class NPC extends Persona {
 
-  private String abilities;
-
-  public String getAbilities() {
-    return abilities;
-  }
-
-  public void setAbilities(String abilities) {
-    this.abilities = abilities;
-  }
+  private int attack;
 
   public NPC(MonsterSpec spec) {
     this.setName(spec.getName());
     this.setHpMax(spec.getHp());
     this.setMpMax(spec.getMp());
     this.setXp(spec.getXp());
-    this.setAbilities(spec.getAbilities());
-  }
-
-  public Action act() {
-    if (!this.isDead() && site != null && site.hasPc()) {
-      return () -> {
-        attack(site.getPc());
-        return true;
-      };
-    }
-    return null;
-  }
-
-  @Override
-  protected void die() {
+    this.attack = spec.getAttack();
   }
 
   public int health() {
     return hp * 4 / hpMax;
   }
 
-  public void attack(Persona p) {
-    if (p != null)
-      p.takeDamage(10);
+  public int attack(Persona p) {
+    if (p != null) {
+      int damage = (int) (Math.random() * (attack + 1));
+      p.takeDamage(damage);
+      return damage;
+    }
+    return 0;
   }
 
-  public void cast(Persona p) {
-    if (p != null)
-      p.takeDamage(100);
+  public int cast(Persona p) {
+    if (p != null) {
+      p.takeDamage(0);
+    }
+    return 0;
   }
 
-  public void heal(Persona p) {
-    if (p != null)
-      p.healDamage(100);
+  public int heal(Persona p) {
+    if (p != null) {
+      p.healDamage(0);
+    }
+    return 0;
   }
 
 }

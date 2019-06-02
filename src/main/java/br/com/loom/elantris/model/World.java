@@ -1,6 +1,5 @@
 package br.com.loom.elantris.model;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,11 +16,11 @@ public class World implements Serializable {
 
   private long time = 0;
   private Site[][] sites = new Site[1000][1000];
-//  private List<NPC> npcs = new LinkedList<>();
+  private List<NPC> npcs = new LinkedList<>();
   private List<MonsterSpec> specs = new LinkedList<>();
   private int totalChance = 0;
 
-  public World() throws IOException {
+  public World() {
     String[] monsterList = TextResourceManager.instance().readResource("monsters.txt");
     for (String monster : monsterList) {
       if (!monster.startsWith("#")) {
@@ -40,9 +39,15 @@ public class World implements Serializable {
         if (monsterRandom < 0) {
           NPC npc = new NPC(spec);
           npc.dropAt(site, Direction.NORTH);
+          npcs.add(npc);
+          return;
         }
       }
     }
+  }
+
+  public List<NPC> getNpcs() {
+    return npcs;
   }
 
   public long getTime() {
@@ -61,18 +66,6 @@ public class World implements Serializable {
       sites[lat][lon] = site;
     }
     return sites[lat][lon];
-  }
-
-  public List<Action> requestNpcActions() {
-    List<Action> actions = new LinkedList<>();
-    for (int i = 0; i < sites.length; i++) {
-      for (int j = 0; j < sites[i].length; j++) {
-        Site site = sites[i][j];
-        if (site != null && site.hasNpc())
-          actions.add(site.getNpc().act());
-      }
-    }
-    return actions;
   }
 
   public void tick() {

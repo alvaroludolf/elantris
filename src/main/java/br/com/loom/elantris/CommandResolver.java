@@ -25,48 +25,56 @@ public class CommandResolver {
       if ("a".equals(cmd)) {
         return () -> {
           actor.turnLeft();
-          return true;
         };
       } else if ("d".equals(cmd)) {
         return () -> {
           actor.turnRight();
-          return true;
         };
       } else if ("w".equals(cmd)) {
         return () -> {
           actor.moveForward();
-          return true;
         };
       } else if ("s".equals(cmd)) {
         return () -> {
           actor.moveBackward();
-          return true;
         };
       } else if ("q".equals(cmd)) {
         return () -> {
           actor.moveLeft();
-          return true;
         };
       } else if ("e".equals(cmd)) {
         return () -> {
           actor.moveRight();
-          return true;
         };
       } else if ("1".equals(cmd)) {
-        return () -> {
-          actor.attack((Persona) npc);
-          return true;
-        };
+        if (!npc.isDead())
+          return () -> {
+            actor.attack((Persona) npc);
+          };
       } else if ("2".equals(cmd)) {
-        return () -> {
-          actor.cast((Persona) npc);
-          return true;
-        };
+        if (!npc.isDead())
+          return () -> {
+            actor.cast((Persona) npc);
+          };
       } else if ("3".equals(cmd)) {
-        return () -> {
-          actor.heal((Persona) actor);
-          return true;
-        };
+        if (!npc.isDead())
+          return () -> {
+            actor.heal((Persona) actor);
+          };
+      } else if ("r".equals(cmd)) {
+        if (npc == null || npc.isDead())
+          return () -> {
+            int timeToRest = actor.rest();
+            for (int i = 0; i < timeToRest; i++) {
+              elantris.world().tick();
+            }
+          };
+      } else if ("t".equals(cmd)) {
+        elantris.save();
+      } else if ("y".equals(cmd)) {
+        elantris.load();
+      } else if ("u".equals(cmd)) {
+        elantris.restart();
       } else {
         // NOOP
       }
@@ -100,17 +108,13 @@ public class CommandResolver {
         actor.setHpMax(actor.getRace().maxHp() + actor.getClasse().maxHp());
         actor.setMpMax(actor.getRace().maxMp() + actor.getClasse().maxMp());
         actor.dropAt(elantris.world().site(500, 500), Direction.NORTH);
-        elantris.setHelp(TextResourceManager.instance().readResource("playHelp.ans"));
-        elantris.save();
       }
     } else {
       if ("1".equals(cmd)) {
         elantris.pc();
         elantris.addMessage("What is your character name?");
-        elantris.setHelp("");
       } else if ("2".equals(cmd)) {
         elantris.load();
-        elantris.setHelp(TextResourceManager.instance().readResource("playHelp.ans"));
       } else {
         // NOOP
       }

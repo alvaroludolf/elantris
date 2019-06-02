@@ -1,2 +1,3 @@
-w-forward  a-turn left  q-move left  1-attack with weapon 3-heal
-s-backward d-turn right e-move right 2-cast a spell       
+w-forward  a-turn left  q-move left     1-attack with weapon 3-heal
+s-backward d-turn right e-move right    2-cast a spell       r-rest
+t-save     y-load       u-restart

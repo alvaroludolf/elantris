@@ -51,9 +51,9 @@ public abstract class Persona implements Interactable, Serializable {
   }
 
   public void move(Site to) {
-    this.site = to;
     site.leave(this);
     to.enter(this);
+    this.site = to;
   }
 
   public void moveBackward() {
@@ -141,7 +141,6 @@ public abstract class Persona implements Interactable, Serializable {
   protected void setHp(int hp) {
     if (hp <= 0) {
       this.hp = 0;
-      die();
     } else if (hp > hpMax) {
       this.hp = hpMax;
     } else {
@@ -152,7 +151,6 @@ public abstract class Persona implements Interactable, Serializable {
   protected void setMp(int mp) {
     if (mp <= 0) {
       this.mp = 0;
-      die();
     } else if (mp > mpMax) {
       this.mp = mpMax;
     } else {
@@ -160,10 +158,13 @@ public abstract class Persona implements Interactable, Serializable {
     }
   }
 
-  protected abstract void die();
-
   public boolean isDead() {
     return hp <= 0;
+  }
+
+  @Override
+  public String toString() {
+    return "Persona [site=" + site + ", name=" + name + "]";
   }
 
 }
