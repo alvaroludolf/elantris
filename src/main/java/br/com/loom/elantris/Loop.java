@@ -9,6 +9,10 @@ import br.com.loom.elantris.model.World;
 import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.character.PC;
 
+/**
+ * Execure one game iteractio if the player took an action
+ *
+ */
 public class Loop {
 
   protected NpcResolver npcResolver;

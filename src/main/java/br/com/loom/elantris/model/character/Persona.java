@@ -5,6 +5,10 @@ import java.io.Serializable;
 import br.com.loom.elantris.model.Interactable;
 import br.com.loom.elantris.model.site.Site;
 
+/**
+ * Something with interactive intent.
+ *
+ */
 public abstract class Persona implements Interactable, Serializable {
 
   protected String name;
@@ -15,6 +19,7 @@ public abstract class Persona implements Interactable, Serializable {
   protected int hp;
   protected int mpMax;
   protected int mp;
+
   public void dropAt(Site site, Direction direction) {
     this.site = site;
     this.direction = direction;

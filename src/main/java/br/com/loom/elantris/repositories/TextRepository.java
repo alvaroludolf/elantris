@@ -12,6 +12,10 @@ import java.util.Map;
 import br.com.loom.elantris.exceptions.ResourceNotFoundException;
 import br.com.loom.elantris.helper.Log;
 
+/**
+ * Read and cache text resource files.
+ *
+ */
 public class TextRepository {
 
   private static Map<String, String[]> resources = new HashMap<>();

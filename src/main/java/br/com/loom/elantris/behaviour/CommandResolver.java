@@ -11,6 +11,11 @@ import br.com.loom.elantris.model.character.PC;
 import br.com.loom.elantris.model.character.Persona;
 import br.com.loom.elantris.model.character.Race;
 
+/**
+ * Solve the user input into something the game should do. Might return an action if the command is supposed to take a
+ * turn to execute.
+ *
+ */
 public class CommandResolver {
 
   private Elantris elantris;

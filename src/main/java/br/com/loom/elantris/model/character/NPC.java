@@ -2,6 +2,10 @@ package br.com.loom.elantris.model.character;
 
 import br.com.loom.elantris.model.MonsterSpec;
 
+/**
+ * A non-player character. (right now only monsters)
+ *
+ */
 public class NPC extends Persona {
 
   private int attack;

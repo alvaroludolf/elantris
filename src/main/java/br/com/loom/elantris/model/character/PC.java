@@ -1,5 +1,9 @@
 package br.com.loom.elantris.model.character;
 
+/**
+ * A Player Character
+ *
+ */
 public class PC extends Persona {
 
   private Classe classe;

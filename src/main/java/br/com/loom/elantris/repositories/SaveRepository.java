@@ -12,6 +12,10 @@ import br.com.loom.elantris.Elantris;
 import br.com.loom.elantris.model.World;
 import br.com.loom.elantris.model.character.PC;
 
+/**
+ * Save and load game. (crappy implementation, I know...)
+ *
+ */
 public class SaveRepository {
 
   File directory;

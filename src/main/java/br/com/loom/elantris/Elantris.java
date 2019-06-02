@@ -13,6 +13,10 @@ import br.com.loom.elantris.repositories.SaveRepository;
 import br.com.loom.elantris.repositories.TextRepository;
 import br.com.loom.elantris.view.Screen;
 
+/**
+ * Kind of controller for the game, but also its bootstrap.
+ *
+ */
 public class Elantris {
 
   public static void main(String[] args) {

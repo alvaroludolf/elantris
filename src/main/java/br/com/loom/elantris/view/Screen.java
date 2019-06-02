@@ -12,6 +12,11 @@ import br.com.loom.elantris.model.character.PC;
 import br.com.loom.elantris.model.site.Site;
 import br.com.loom.elantris.repositories.TextRepository;
 
+/**
+ * Implements the output of the game. Definitely should provide a much better support for ANSI escapes from resource
+ * files.
+ *
+ */
 public class Screen {
 
   public static final String BRIGHT_BLACK = "\u001b[30;1m";

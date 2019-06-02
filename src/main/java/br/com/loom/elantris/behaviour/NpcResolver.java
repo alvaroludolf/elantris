@@ -5,6 +5,10 @@ import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.character.PC;
 
+/**
+ * Implements the AI of the npc. Nothing of interesting to see here for now.
+ *
+ */
 public class NpcResolver {
 
   public Action resolve(NPC actor) {
