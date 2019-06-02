@@ -5,9 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import br.com.loom.elantris.model.World;
-import br.com.loom.elantris.model.character.Character;
 import br.com.loom.elantris.model.character.Direction;
 import br.com.loom.elantris.model.character.NPC;
+import br.com.loom.elantris.model.character.PC;
+import br.com.loom.elantris.model.character.Persona;
 
 public class Site implements Serializable {
 
@@ -17,7 +18,7 @@ public class Site implements Serializable {
   private SiteType type;
   private List<Feature> features = new LinkedList<>();
   private List<Props> props = new LinkedList<>();
-  private List<Character> chars = new LinkedList<>();
+  private List<Persona> chars = new LinkedList<>();
 
   public Site(World world, int lat, int lon, SiteType type) {
     super();
@@ -25,6 +26,70 @@ public class Site implements Serializable {
     this.lat = lat;
     this.lon = lon;
     this.type = type;
+  }
+
+  public void enter(Persona persona) {
+    chars.add(persona);
+    if (persona instanceof PC) {
+      for (int i = -3; i < 4; i++) {
+        world.addMonster(world.site(lat + 6, lon + i));
+        world.addMonster(world.site(lat - 6, lon + i));
+        world.addMonster(world.site(lat + i, lon + 6));
+        world.addMonster(world.site(lat + i, lon - 6));
+      }
+    }
+  }
+
+  public int getLat() {
+    return lat;
+  }
+
+  public int getLon() {
+    return lon;
+  }
+
+  public NPC getNpc() {
+    for (Persona persona : chars) {
+      if (persona instanceof NPC)
+        return (NPC) persona;
+    }
+    return null;
+  }
+
+  public PC getPc() {
+    for (Persona persona : chars) {
+      if (persona instanceof PC)
+        return (PC) persona;
+    }
+    return null;
+  }
+
+  public SiteType getType() {
+    return type;
+  }
+
+  public boolean hasNpc() {
+    for (Persona persona : chars) {
+      if (persona instanceof NPC)
+        return true;
+    }
+    return false;
+  }
+
+  public boolean hasPc() {
+    for (Persona persona : chars) {
+      if (persona instanceof PC)
+        return true;
+    }
+    return false;
+  }
+
+  public void leave(Persona persona) {
+    chars.remove(persona);
+  }
+
+  public Site siteAt(Direction direction) {
+    return siteAtDistance(direction, 1);
   }
 
   public Site siteAtDistance(Direction direction, int distance) {
@@ -42,10 +107,6 @@ public class Site implements Serializable {
     }
   }
 
-  public Site siteAt(Direction direction) {
-    return siteAtDistance(direction, 1);
-  }
-
   public Site siteOpposedAt(Direction direction) {
     switch (direction) {
     case SOUTH:
@@ -61,43 +122,9 @@ public class Site implements Serializable {
     }
   }
 
-  public void leave(Character character) {
-    chars.remove(character);
-  }
-
-  public void enter(Character character) {
-    chars.add(character);
-    for (int i = -3; i < 4; i++) {
-      world.addMonster(world.site(lat + 6, lon + i));
-      world.addMonster(world.site(lat - 6, lon + i));
-      world.addMonster(world.site(lat + i, lon + 6));
-      world.addMonster(world.site(lat + i, lon - 6));
-    }
-
-  }
-
-  public int getLat() {
-    return lat;
-  }
-
-  public int getLon() {
-    return lon;
-  }
-
-  public SiteType getType() {
-    return type;
-  }
-
-  public void addNpc(NPC npc) {
-    chars.add(npc);
-  }
-
-  public boolean hasNpc() {
-    for (Character character : chars) {
-      if (character instanceof NPC)
-        return true;
-    }
-    return false;
+  @Override
+  public String toString() {
+    return "Site [lat=" + lat + ", lon=" + lon + ", type=" + type + "]";
   }
 
 }

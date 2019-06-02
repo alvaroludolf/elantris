@@ -1,13 +1,13 @@
 package br.com.loom.elantris;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.character.Classe;
 import br.com.loom.elantris.model.character.Direction;
+import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.character.PC;
+import br.com.loom.elantris.model.character.Persona;
 import br.com.loom.elantris.model.character.Race;
 
 public class CommandResolver {
@@ -19,39 +19,54 @@ public class CommandResolver {
     this.elantris = elantris;
   }
 
-  public List<Action> resolve(PC actor, String cmd) throws IOException {
-    LinkedList<Action> actions = new LinkedList<>();
-    if (actor != null && actor.complete()) {
+  public Action resolve(PC actor, String cmd) throws IOException {
+    if (actor != null && actor.complete() && !actor.isDead()) {
+      NPC npc = actor.getSite().getNpc();
       if ("a".equals(cmd)) {
-        actions.add(() -> {
+        return () -> {
           actor.turnLeft();
           return true;
-        });
+        };
       } else if ("d".equals(cmd)) {
-        actions.add(() -> {
+        return () -> {
           actor.turnRight();
           return true;
-        });
+        };
       } else if ("w".equals(cmd)) {
-        actions.add(() -> {
+        return () -> {
           actor.moveForward();
           return true;
-        });
+        };
       } else if ("s".equals(cmd)) {
-        actions.add(() -> {
+        return () -> {
           actor.moveBackward();
           return true;
-        });
+        };
       } else if ("q".equals(cmd)) {
-        actions.add(() -> {
+        return () -> {
           actor.moveLeft();
           return true;
-        });
+        };
       } else if ("e".equals(cmd)) {
-        actions.add(() -> {
+        return () -> {
           actor.moveRight();
           return true;
-        });
+        };
+      } else if ("1".equals(cmd)) {
+        return () -> {
+          actor.attack((Persona) npc);
+          return true;
+        };
+      } else if ("2".equals(cmd)) {
+        return () -> {
+          actor.cast((Persona) npc);
+          return true;
+        };
+      } else if ("3".equals(cmd)) {
+        return () -> {
+          actor.heal((Persona) actor);
+          return true;
+        };
       } else {
         // NOOP
       }
@@ -82,22 +97,25 @@ public class CommandResolver {
         } else {
           return null;
         }
-        actor.setHpMax(actor.getRace().maxHp());
-        actor.setMpMax(actor.getRace().maxMp());
+        actor.setHpMax(actor.getRace().maxHp() + actor.getClasse().maxHp());
+        actor.setMpMax(actor.getRace().maxMp() + actor.getClasse().maxMp());
         actor.dropAt(elantris.world().site(500, 500), Direction.NORTH);
+        elantris.setHelp(TextResourceManager.instance().readResource("playHelp.ans"));
         elantris.save();
       }
     } else {
       if ("1".equals(cmd)) {
         elantris.pc();
         elantris.addMessage("What is your character name?");
+        elantris.setHelp("");
       } else if ("2".equals(cmd)) {
         elantris.load();
+        elantris.setHelp(TextResourceManager.instance().readResource("playHelp.ans"));
       } else {
         // NOOP
       }
     }
-    return actions;
+    return null;
   }
 
 }

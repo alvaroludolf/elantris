@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import br.com.loom.elantris.TextResourceManager;
+import br.com.loom.elantris.model.character.Direction;
 import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.site.Site;
 import br.com.loom.elantris.model.site.SiteType;
@@ -16,9 +17,9 @@ public class World implements Serializable {
 
   private long time = 0;
   private Site[][] sites = new Site[1000][1000];
-  private List<NPC> npcs = new LinkedList<>();
+//  private List<NPC> npcs = new LinkedList<>();
   private List<MonsterSpec> specs = new LinkedList<>();
-  int totalChance = 0;
+  private int totalChance = 0;
 
   public World() throws IOException {
     String[] monsterList = TextResourceManager.instance().readResource("monsters.txt");
@@ -38,7 +39,7 @@ public class World implements Serializable {
         monsterRandom -= spec.getChance();
         if (monsterRandom < 0) {
           NPC npc = new NPC(spec);
-          site.addNpc(npc);
+          npc.dropAt(site, Direction.NORTH);
         }
       }
     }
@@ -62,7 +63,23 @@ public class World implements Serializable {
     return sites[lat][lon];
   }
 
-  private SiteType defineSiteType(int lat, int lon) {
+  public List<Action> requestNpcActions() {
+    List<Action> actions = new LinkedList<>();
+    for (int i = 0; i < sites.length; i++) {
+      for (int j = 0; j < sites[i].length; j++) {
+        Site site = sites[i][j];
+        if (site != null && site.hasNpc())
+          actions.add(site.getNpc().act());
+      }
+    }
+    return actions;
+  }
+
+  public void tick() {
+    time++;
+  }
+
+  protected SiteType defineSiteType(int lat, int lon) {
     SiteType type;
     Site nearbySite;
     int[] nearby = new int[SITE_VARIANCE];
@@ -86,21 +103,6 @@ public class World implements Serializable {
     }
     type = SiteType.values()[winner];
     return type;
-  }
-
-  public List<Action> requestNpcActions() {
-    List<Action> actions = new LinkedList<>();
-    for (NPC npc : npcs) {
-      Action[] npcActions = npc.act();
-      for (Action action : npcActions) {
-        actions.add(action);
-      }
-    }
-    return actions;
-  }
-
-  public void tick() {
-    time++;
   }
 
   protected boolean safeSite(int lat, int lon) {

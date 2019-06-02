@@ -7,21 +7,19 @@ import br.com.loom.elantris.model.World;
 
 public class Loop {
 
-  public void tick(World world, List<Action> pcActions) {
+  public void tick(World world, Action pcActions) {
     if (world == null || pcActions == null)
       return;
 
     List<Action> npcActions = world.requestNpcActions();
 
-    boolean worldTick = false;
-    for (Action action : pcActions) {
-      worldTick |= action.act();
-    }
-
+    boolean worldTick = pcActions.act();
     if (worldTick) {
       for (Action action : npcActions) {
-        action.act();
+        if (action != null)
+          action.act();
       }
+      world.tick();
     }
   }
 }

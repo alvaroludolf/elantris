@@ -1,15 +1,13 @@
 package br.com.loom.elantris;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 
 import br.com.loom.elantris.model.World;
-import br.com.loom.elantris.model.character.Character;
 import br.com.loom.elantris.model.character.Direction;
+import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.character.PC;
 import br.com.loom.elantris.model.site.Site;
 
@@ -32,96 +30,146 @@ public class Screen {
   public static final String CYAN = "\u001b[36m";
   public static final String WHITE = "\u001b[37m";
   public static final String RESET = "\u001b[0m";
+  public static final String[] logo = TextResourceManager.instance().readResource("logo.ans");
+  public static final String[] mainScreen = TextResourceManager.instance().readResource("main.ans");
 
   private PrintWriter out;
   private int height;
   private int width;
-  private String[] mainScreen;
-  private String[] body;
-  private String[] message;
-  private String[] help;
+  private String[] body = new String[13];
+  private String[] message = new String[3];
+  private String[] help = new String[2];
 
-  public String[] getMessage() {
-    return message;
-  }
-
-  public String[] getHelp() {
-    return help;
-  }
-
-  public Screen(PrintStream out, int height, int width) throws IOException, URISyntaxException {
+  public Screen(PrintStream out, int height, int width) {
     this.out = new PrintWriter(out, true, StandardCharsets.UTF_8);
-    this.mainScreen = TextResourceManager.instance().readResource("main.ans");
-    this.body = TextResourceManager.instance().readResource("initial.ans");
-    this.message = new String[3];
-    this.help = new String[] { "1 - Create a new player", "2 - Load saved game" };
+    setHelp("1 - Create a new player", "2 - Load saved game");
     this.height = height;
     this.width = width;
   }
 
+  public void addMessage(String m) {
+    message[0] = message[1];
+    message[1] = message[2];
+    message[2] = m;
+  }
+
   public void draw(World world, PC pc) {
+    DecimalFormat df = new DecimalFormat("00000");
+
     resetCursor();
     for (int y = 0; y < height; y++) {
       breakLine();
       out.print(mainScreen[y]);
       moveLeft(width);
+
+      buildBody(pc);
+
       for (int x = 0; x < width; x++) {
-        if (x > 1 && x < 56 && y > 0 && y < 21 && y - 1 < body.length) {
-          writeCharacter(x - 2, body[y - 1]);
-        } else if (x > 1 && x < 79 && y == 22) {
-          writeCharacter(x - 2, message[0]);
-        } else if (x > 1 && x < 79 && y == 23) {
-          writeCharacter(x - 2, message[1]);
-        } else if (x > 1 && x < 79 && y == 24) {
-          writeCharacter(x - 2, message[2]);
-        } else if (x > 1 && x < 79 && y == 26) {
-          writeCharacter(x - 2, help[0]);
-        } else if (x > 1 && x < 79 && y == 27) {
-          writeCharacter(x - 2, help[1]);
-        } else if (pc != null && x > 63 && x < 79 && y == 13) {
-          writeCharacter(x - 64, pc.getName());
-        } else if (pc != null && pc.getRace() != null && x > 63 && x < 79 && y == 14) {
-          writeCharacter(x - 64, pc.getRace().name());
-        } else if (pc != null && pc.getClasse() != null && x > 64 && x < 79 && y == 15) {
-          writeCharacter(x - 65, pc.getClasse().name());
-        } else if (pc != null && pc.complete() && x > 61 && x < 79 && y == 16) {
-          writeCharacter(x - 62, pc.getHp() + "/" + pc.getHpMax());
-        } else if (pc != null && pc.complete() && x > 61 && x < 79 && y == 17) {
-          writeCharacter(x - 62, pc.getMp() + "/" + pc.getMpMax());
-        } else if (pc != null && pc.complete() && world != null && minimap(world, pc, y, x)) {
-          // NOOP
+        if (writeAt(x, y, 1, 56, 1, 5, logo)) {
+        } else if (writeAt(x, y, 1, 55, 7, 19, body)) {
+        } else if (writeAt(x, y, 1, 78, 22, 24, message)) {
+        } else if (writeAt(x, y, 1, 78, 26, 27, help)) {
+        } else if (pc != null && writeAt(x, y, 63, 78, 13, pc.getName())) {
+        } else if (pc != null && pc.getRace() != null && writeAt(x, y, 63, 74, 14, pc.getRace().name())) {
+        } else if (pc != null && pc.getClasse() != null && writeAt(x, y, 64, 78, 15, pc.getClasse().name())) {
+        } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 16, pc.getHp() + "/" + pc.getHpMax())) {
+        } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 17, pc.getMp() + "/" + pc.getMpMax())) {
+        } else if (pc != null && pc.complete() && writeAt(x, y, 61, 67, 11, df.format(pc.getSite().getLon()))) {
+        } else if (pc != null && pc.complete() && writeAt(x, y, 72, 78, 11, df.format(pc.getSite().getLat()))) {
+        } else if (minimap(world, pc, y, x)) {
         } else {
           moveRight(1);
         }
       }
-    }
-    if (pc != null && pc.complete() && world != null) {
-      coordinates(pc);
     }
 
     conclude();
     out.flush();
   }
 
-  protected void writeCharacter(int i, String s) {
-    if (s != null && i < s.length())
-      colorChar(s.charAt(i), WHITE);
-    else
-      moveRight(1);
+  public String[] getHelp() {
+    return help;
   }
 
-  protected void coordinates(Character pc) {
-    DecimalFormat df = new DecimalFormat("00000");
-    resetCursor();
-    moveDown(12);
-    moveRight(62);
-    out.print(df.format(pc.getSite().getLon()));
+  public String[] getMessage() {
+    return message;
+  }
+
+  public void setHelp(String... h) {
+    help[0] = (h.length > 0) ? h[0] : "";
+    help[1] = (h.length > 1) ? h[1] : "";
+  }
+
+  protected void breakLine() {
+    moveDown(1);
     moveLeft(width);
-    moveRight(73);
-    out.print(df.format(pc.getSite().getLat()));
   }
 
-  protected boolean minimap(World world, Character pc, int y, int x) {
+  protected void buildBody(PC pc) {
+    for (int i = 0; i < body.length; i++) {
+      body[i] = null;
+    }
+    if (pc == null || !pc.complete()) {
+      for (int i = 0; i < body.length; i++) {
+        body[i] = TextResourceManager.instance().readResource("initial.ans")[i];
+      }
+      return;
+    }
+    int i = 0;
+    Site site = pc.getSite();
+    body[i++] = "You are in a " + site.getType().shortDescription();
+    body[i++] = "It is a " + pc.getSite().getType().longDescription();
+    i++;
+    if (site.hasNpc()) {
+      NPC npc = site.getNpc();
+      switch (npc.health()) {
+      case 4:
+        body[i++] = "In front of you, you see a " + npc.getName() + ". IT ATTACKS!!!";
+        break;
+      case 3:
+        body[i++] = "In front of you, you see a " + npc.getName() + ". It is bruised.";
+        break;
+      case 2:
+        body[i++] = "In front of you, you see a " + npc.getName() + ". It is hurt.";
+        break;
+      case 1:
+        body[i++] = "In front of you, you see a " + npc.getName() + ". It is injuried.";
+        break;
+      case 0:
+        if (npc.isDead()) {
+          body[i++] = "In front of you, you see a " + npc.getName() + ". It is dead...";
+        } else {
+          body[i++] = "In front of you, you see a " + npc.getName() + ". it is crippled.";
+        }
+      }
+
+    }
+  }
+
+  protected void clearScreen() {
+    out.print("\u001b[0J");
+  }
+
+  protected void colorChar(char c, String color) {
+    out.print(color + c);
+    colorReset();
+  }
+
+  protected void colorReset() {
+    out.print(RESET);
+  }
+
+  protected void conclude() {
+    moveDown(height - 1);
+    moveLeft(width);
+    moveUp(1);
+    moveRight(2);
+  }
+
+  protected boolean minimap(World world, PC pc, int y, int x) {
+    if (pc == null || !pc.complete() || world == null) {
+      return false;
+    }
     if (x == 68 && y == 10) {
       colorChar('@', BRIGHT_YELLOW);
     } else if (x == 68 && y == 0 && pc.getDirection() == Direction.NORTH) {
@@ -150,10 +198,19 @@ public class Screen {
         site = world.site(pc.getSite().getLat() + sidewayDelta, pc.getSite().getLon() - forwardDelta);
         break;
       }
+
+      int max = Math.max(Math.abs(sidewayDelta), Math.abs(forwardDelta));
+      int min = Math.min(Math.abs(sidewayDelta), Math.abs(forwardDelta));
+      int distance = (int) ((max - min) + (min * 1.4142));
+
       if (site.getLat() == 500 && site.getLon() == 500) {
         colorChar('▒', BRIGHT_WHITE);
-      } else if (site.hasNpc()) {
-        colorChar('M', BRIGHT_RED);
+      } else if (site.hasNpc() && distance < 6) {
+        if (site.getNpc().isDead()) {
+          colorChar('w', RED);
+        } else {
+          colorChar('M', BRIGHT_RED);
+        }
       } else {
         switch (site.getType()) {
         case FOREST:
@@ -173,44 +230,28 @@ public class Screen {
           break;
         }
       }
-    } else {
+    } else
+
+    {
       return false;
     }
     return true;
-  }
-
-  protected void colorChar(char c, String color) {
-    out.print(color + c);
-    colorReset();
-  }
-
-  protected void colorReset() {
-    out.print(RESET);
-  }
-
-  protected void moveUp(int n) {
-    out.print("\u001b[" + n + "A");
   }
 
   protected void moveDown(int n) {
     out.print("\u001b[" + n + "B");
   }
 
-  protected void moveRight(int n) {
-    out.print("\u001b[" + n + "C");
-  }
-
   protected void moveLeft(int n) {
     out.print("\u001b[" + n + "D");
   }
 
-  protected void clearScreen() {
-    out.print("\u001b[0J");
+  protected void moveRight(int n) {
+    out.print("\u001b[" + n + "C");
   }
 
-  protected void breakLine() {
-    moveDown(1);
-    moveLeft(width);
+  protected void moveUp(int n) {
+    out.print("\u001b[" + n + "A");
   }
 
   protected void resetCursor() {
@@ -218,11 +259,27 @@ public class Screen {
     moveLeft(width);
   }
 
-  protected void conclude() {
-    moveDown(height - 1);
-    moveLeft(width);
-    moveUp(1);
-    moveRight(2);
+  protected boolean writeAt(int x, int y, int x1, int x2, int y1, int y2, String... s) {
+    int i = y - y1;
+    if (i >= 0 && i < s.length && y >= y1 && y <= y2 && writeAt(x, y, x1, x2, y, s[i])) {
+      return true;
+    }
+    return false;
+  }
+
+  protected boolean writeAt(int x, int y, int x1, int x2, int y1, String s) {
+    if (x > x1 && x <= x2 && y == y1) {
+      writeCharacter(x - x1 - 1, s);
+      return true;
+    }
+    return false;
+  }
+
+  protected void writeCharacter(int i, String s) {
+    if (s != null && i < s.length())
+      colorChar(s.charAt(i), WHITE);
+    else
+      moveRight(1);
   }
 
 }

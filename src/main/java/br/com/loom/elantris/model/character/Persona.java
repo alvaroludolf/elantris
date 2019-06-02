@@ -5,7 +5,7 @@ import java.io.Serializable;
 import br.com.loom.elantris.model.Interactable;
 import br.com.loom.elantris.model.site.Site;
 
-public abstract class Character implements Interactable, Serializable {
+public abstract class Persona implements Interactable, Serializable {
 
   protected Site site;
   protected Direction direction;
@@ -14,12 +14,7 @@ public abstract class Character implements Interactable, Serializable {
   protected int hp;
   protected int mpMax;
   protected int mp;
-
-  public void dropAt(Site site, Direction direction) {
-    this.site = site;
-    this.site.enter(this);
-    this.direction = direction;
-  }
+  protected String name;
 
   public Direction getDirection() {
     return direction;
@@ -49,10 +44,16 @@ public abstract class Character implements Interactable, Serializable {
     return xp;
   }
 
+  public void dropAt(Site site, Direction direction) {
+    this.site = site;
+    this.direction = direction;
+    this.site.enter(this);
+  }
+
   public void move(Site to) {
+    this.site = to;
     site.leave(this);
     to.enter(this);
-    this.site = to;
   }
 
   public void moveBackward() {
@@ -119,6 +120,50 @@ public abstract class Character implements Interactable, Serializable {
     case EAST:
       direction = Direction.SOUTH;
     }
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void takeDamage(int attack) {
+    setHp(hp - attack);
+  }
+
+  public void healDamage(int heal) {
+    setHp(hp + heal);
+  }
+
+  protected void setHp(int hp) {
+    if (hp <= 0) {
+      this.hp = 0;
+      die();
+    } else if (hp > hpMax) {
+      this.hp = hpMax;
+    } else {
+      this.hp = hp;
+    }
+  }
+
+  protected void setMp(int mp) {
+    if (mp <= 0) {
+      this.mp = 0;
+      die();
+    } else if (mp > mpMax) {
+      this.mp = mpMax;
+    } else {
+      this.mp = mp;
+    }
+  }
+
+  protected abstract void die();
+
+  public boolean isDead() {
+    return hp <= 0;
   }
 
 }

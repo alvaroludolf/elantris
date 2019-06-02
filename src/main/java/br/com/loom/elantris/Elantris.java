@@ -1,13 +1,12 @@
 package br.com.loom.elantris;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Scanner;
 
 import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.World;
-import br.com.loom.elantris.model.character.Character;
 import br.com.loom.elantris.model.character.PC;
+import br.com.loom.elantris.model.character.Persona;
 
 public class Elantris {
 
@@ -42,9 +41,11 @@ public class Elantris {
   }
 
   public void addMessage(String m) {
-    screen.getMessage()[0] = screen.getMessage()[1];
-    screen.getMessage()[1] = screen.getMessage()[2];
-    screen.getMessage()[2] = m;
+    screen.addMessage(m);
+  }
+
+  public void setHelp(String... h) {
+    screen.setHelp(h);
   }
 
   public void save() {
@@ -67,7 +68,7 @@ public class Elantris {
     }
   }
 
-  public Character pc() {
+  public Persona pc() {
     if (pc == null)
       pc = new PC();
     return pc;
@@ -89,14 +90,16 @@ public class Elantris {
 
   private void execute() throws IOException {
     String cmd;
-    Loop loop = new Loop();
     CommandResolver resolver = new CommandResolver(this);
+    Loop loop = new Loop();
 
     screen.draw(world, pc);
     while (sc.hasNext()) {
       cmd = sc.next();
-      List<Action> playerActions = resolver.resolve(pc, cmd);
-      loop.tick(world, playerActions);
+      Action playerAction = resolver.resolve(pc, cmd);
+      if (playerAction != null) {
+        loop.tick(world, playerAction);
+      }
       screen.draw(world, pc);
     }
   }
