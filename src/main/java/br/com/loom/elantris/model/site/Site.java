@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.com.loom.elantris.Log;
+import br.com.loom.elantris.helper.Log;
 import br.com.loom.elantris.model.World;
 import br.com.loom.elantris.model.character.Direction;
 import br.com.loom.elantris.model.character.NPC;
@@ -17,8 +17,6 @@ public class Site implements Serializable {
   private int lat;
   private int lon;
   private SiteType type;
-  private List<Feature> features = new LinkedList<>();
-  private List<Props> props = new LinkedList<>();
   private List<Persona> chars = new LinkedList<>();
 
   public Site(World world, int lat, int lon, SiteType type) {

@@ -1,7 +1,8 @@
-package br.com.loom.elantris;
+package br.com.loom.elantris.behaviour;
 
 import java.io.IOException;
 
+import br.com.loom.elantris.Elantris;
 import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.character.Classe;
 import br.com.loom.elantris.model.character.Direction;
@@ -20,6 +21,8 @@ public class CommandResolver {
   }
 
   public Action resolve(PC actor, String cmd) throws IOException {
+    if ("quit".equals(cmd) || "exit".equals(cmd))
+      System.exit(0);
     if (actor != null && actor.complete() && !actor.isDead()) {
       NPC npc = actor.getSite().getNpc();
       if ("a".equals(cmd)) {
@@ -78,7 +81,7 @@ public class CommandResolver {
       } else {
         // NOOP
       }
-    } else if (actor != null && !actor.complete()) {
+    } else if (actor != null && !actor.complete()) { // Complete the character creation process.
       if (actor.getName() == null) {
         actor.setName(cmd);
         elantris.addMessage("What is your character class?");
@@ -110,10 +113,10 @@ public class CommandResolver {
         actor.dropAt(elantris.world().site(500, 500), Direction.NORTH);
       }
     } else {
-      if ("1".equals(cmd)) {
+      if ("1".equals(cmd)) { // creates a new character
         elantris.pc();
         elantris.addMessage("What is your character name?");
-      } else if ("2".equals(cmd)) {
+      } else if ("2".equals(cmd)) { // load a save game
         elantris.load();
       } else {
         // NOOP

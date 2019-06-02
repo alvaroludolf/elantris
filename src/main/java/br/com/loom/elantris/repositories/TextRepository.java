@@ -1,4 +1,4 @@
-package br.com.loom.elantris;
+package br.com.loom.elantris.repositories;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,14 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.loom.elantris.exceptions.ResourceNotFoundException;
+import br.com.loom.elantris.helper.Log;
 
-public class TextResourceManager {
+public class TextRepository {
 
   private static Map<String, String[]> resources = new HashMap<>();
 
-  private static TextResourceManager instance = new TextResourceManager();
+  public static TextRepository instance = new TextRepository();
 
-  public static TextResourceManager instance() {
+  public static TextRepository instance() {
     return instance;
   }
 
@@ -26,7 +27,7 @@ public class TextResourceManager {
       String[] resource = resources.get(resourceName);
       if (resource == null) {
         try (BufferedReader s = new BufferedReader(
-            new InputStreamReader(Screen.class.getResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
+            new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("br/com/loom/elantris/" + resourceName), StandardCharsets.UTF_8))) {
           List<String> resourceLines = new LinkedList<>();
           String line;
           while ((line = s.readLine()) != null)
@@ -37,8 +38,7 @@ public class TextResourceManager {
       }
       return resource;
     } catch (IOException | NullPointerException e) {
-      Log.log(e.getMessage());
-      e.printStackTrace(Log.printWriter());
+      Log.log(e);
       throw new ResourceNotFoundException(e);
     }
   }

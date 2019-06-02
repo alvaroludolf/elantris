@@ -1,10 +1,11 @@
-package br.com.loom.elantris;
+package br.com.loom.elantris.behaviour;
 
+import br.com.loom.elantris.helper.Log;
 import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.character.PC;
 
-public class NpcActionResolver {
+public class NpcResolver {
 
   public Action resolve(NPC actor) {
     if (!actor.isDead() && actor.getSite() != null && actor.getSite().hasPc()) {

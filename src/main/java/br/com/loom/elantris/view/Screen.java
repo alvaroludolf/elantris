@@ -1,4 +1,4 @@
-package br.com.loom.elantris;
+package br.com.loom.elantris.view;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -10,6 +10,7 @@ import br.com.loom.elantris.model.character.Direction;
 import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.character.PC;
 import br.com.loom.elantris.model.site.Site;
+import br.com.loom.elantris.repositories.TextRepository;
 
 public class Screen {
 
@@ -30,8 +31,6 @@ public class Screen {
   public static final String CYAN = "\u001b[36m";
   public static final String WHITE = "\u001b[37m";
   public static final String RESET = "\u001b[0m";
-  public static final String[] logo = TextResourceManager.instance().readResource("logo.ans");
-  public static final String[] mainScreen = TextResourceManager.instance().readResource("main.ans");
 
   private PrintWriter out;
   private int height;
@@ -42,7 +41,7 @@ public class Screen {
 
   public Screen(PrintStream out, int height, int width) {
     this.out = new PrintWriter(out, true, StandardCharsets.UTF_8);
-    setHelp(TextResourceManager.instance().readResource("createHelp.ans"));
+    setHelp(TextRepository.instance().readResource("createHelp.ans"));
     this.height = height;
     this.width = width;
   }
@@ -55,11 +54,13 @@ public class Screen {
 
   public void draw(World world, PC pc) {
     DecimalFormat df = new DecimalFormat("00000");
+    String[] main = TextRepository.instance().readResource("main.ans");
+    String[] logo = TextRepository.instance().readResource("logo.ans");
 
-    resetCursor();
-    for (int y = 0; y < height; y++) {
+    reset();
+    for (int y = 0; y < main.length; y++) {
       breakLine();
-      out.print(mainScreen[y]);
+      out.print(main[y]);
       moveLeft(width);
 
       buildBody(pc);
@@ -75,7 +76,7 @@ public class Screen {
         } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 16, pc.getHp() + "/" + pc.getHpMax())) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 17, pc.getMp() + "/" + pc.getMpMax())) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 61, 78, 18, String.valueOf(pc.getXp()))) {
-        } else if (pc != null && pc.complete() && writeAt(x, y, 64, 78, 19, String.valueOf(world.getTime()))) {
+        } else if (pc != null && pc.complete() && writeAt(x, y, 64, 78, 19, String.valueOf(world.time()))) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 61, 67, 11, df.format(pc.getSite().getLon()))) {
         } else if (pc != null && pc.complete() && writeAt(x, y, 72, 78, 11, df.format(pc.getSite().getLat()))) {
         } else if (minimap(world, pc, y, x)) {
@@ -112,43 +113,45 @@ public class Screen {
     for (int i = 0; i < body.length; i++) {
       body[i] = null;
     }
+    String[] initial = TextRepository.instance().readResource("initial.ans");
     if (pc == null || !pc.complete()) {
-      for (int i = 0; i < body.length; i++) {
-        body[i] = TextResourceManager.instance().readResource("initial.ans")[i];
+      for (int i = 0; i < body.length && i < initial.length; i++) {
+        body[i] = initial[i];
       }
       return;
     }
     int i = 0;
     Site site = pc.getSite();
-    body[i++] = "You are in a " + site.getType().shortDescription();
-    String[] descriptions = pc.getSite().getType().longDescription();
-    for (String description : descriptions) {
-      body[i++] = description;
-    }
-    i++;
-    if (site.hasNpc()) {
-      NPC npc = site.getNpc();
-      switch (npc.health()) {
-      case 4:
-        body[i++] = "In front of you, you see a " + npc.getName() + ". IT ATTACKS!!!";
-        break;
-      case 3:
-        body[i++] = "In front of you, you see a " + npc.getName() + ". It is bruised.";
-        break;
-      case 2:
-        body[i++] = "In front of you, you see a " + npc.getName() + ". It is hurt.";
-        break;
-      case 1:
-        body[i++] = "In front of you, you see a " + npc.getName() + ". It is injuried.";
-        break;
-      case 0:
-        if (npc.isDead()) {
-          body[i++] = "In front of you, you see a " + npc.getName() + ". It is dead...";
-        } else {
-          body[i++] = "In front of you, you see a " + npc.getName() + ". it is crippled.";
+    if (site != null) {
+      body[i++] = "You are in a " + site.getType().shortDescription();
+      String[] descriptions = pc.getSite().getType().longDescription();
+      for (String description : descriptions) {
+        body[i++] = description;
+      }
+      i++;
+      if (site.hasNpc()) {
+        NPC npc = site.getNpc();
+        switch (npc.health()) {
+        case 4:
+          body[i++] = "In front of you, you see a " + npc.getName() + ". IT ATTACKS!!!";
+          break;
+        case 3:
+          body[i++] = "In front of you, you see a " + npc.getName() + ". It is bruised.";
+          break;
+        case 2:
+          body[i++] = "In front of you, you see a " + npc.getName() + ". It is hurt.";
+          break;
+        case 1:
+          body[i++] = "In front of you, you see a " + npc.getName() + ". It is injuried.";
+          break;
+        case 0:
+          if (npc.isDead()) {
+            body[i++] = "In front of you, you see a " + npc.getName() + ". It is dead...";
+          } else {
+            body[i++] = "In front of you, you see a " + npc.getName() + ". it is crippled.";
+          }
         }
       }
-
     }
   }
 
@@ -178,19 +181,19 @@ public class Screen {
     }
     if (x == 68 && y == 10) {
       colorChar('@', BRIGHT_YELLOW);
-    } else if (x == 68 && y == 0 && pc.getDirection() == Direction.NORTH) {
+    } else if (x == 68 && y == 0 && pc.direction() == Direction.NORTH) {
       out.print("N");
-    } else if (x == 68 && y == 12 && pc.getDirection() == Direction.SOUTH) {
+    } else if (x == 68 && y == 12 && pc.direction() == Direction.SOUTH) {
       out.print("N");
-    } else if (x == 57 && y == 6 && pc.getDirection() == Direction.EAST) {
+    } else if (x == 57 && y == 6 && pc.direction() == Direction.EAST) {
       out.print("N");
-    } else if (x == 79 && y == 6 && pc.getDirection() == Direction.WEST) {
+    } else if (x == 79 && y == 6 && pc.direction() == Direction.WEST) {
       out.print("N");
     } else if (x > 57 && x < 79 && y > 0 && y < 11) {
       int forwardDelta = 10 - y;
       int sidewayDelta = x - 68;
       Site site = null;
-      switch (pc.getDirection()) {
+      switch (pc.direction()) {
       case EAST:
         site = world.site(pc.getSite().getLat() - sidewayDelta, pc.getSite().getLon() + forwardDelta);
         break;
@@ -205,40 +208,41 @@ public class Screen {
         break;
       }
 
-      int max = Math.max(Math.abs(sidewayDelta), Math.abs(forwardDelta));
-      int min = Math.min(Math.abs(sidewayDelta), Math.abs(forwardDelta));
-      int distance = (int) ((max - min) + (min * 1.4142));
+      if (site != null) {
 
-      if (site.getLat() == 500 && site.getLon() == 500) {
-        colorChar('▒', BRIGHT_WHITE);
-      } else if (site.hasNpc() && distance < 6) {
-        if (site.getNpc().isDead()) {
-          colorChar('w', RED);
+        int max = Math.max(Math.abs(sidewayDelta), Math.abs(forwardDelta));
+        int min = Math.min(Math.abs(sidewayDelta), Math.abs(forwardDelta));
+        int distance = (int) ((max - min) + (min * 1.4142));
+
+        if (site.getLat() == 500 && site.getLon() == 500) {
+          colorChar('▒', BRIGHT_WHITE);
+        } else if (site.hasNpc() && distance < 6) {
+          if (site.getNpc().isDead()) {
+            colorChar('w', RED);
+          } else {
+            colorChar('M', BRIGHT_RED);
+          }
         } else {
-          colorChar('M', BRIGHT_RED);
-        }
-      } else {
-        switch (site.getType()) {
-        case FOREST:
-          colorChar('♣', GREEN);
-          break;
-        case HILL:
-          colorChar('∩', BRIGHT_GREEN);
-          break;
-        case MARCH:
-          colorChar('ⁿ', GREEN);
-          break;
-        case MOUNTAIN:
-          colorChar('▲', RED);
-          break;
-        case PLAIN:
-          colorChar('.', BRIGHT_GREEN);
-          break;
+          switch (site.getType()) {
+          case FOREST:
+            colorChar('♣', GREEN);
+            break;
+          case HILL:
+            colorChar('∩', BRIGHT_GREEN);
+            break;
+          case MARSH:
+            colorChar('ⁿ', GREEN);
+            break;
+          case MOUNTAIN:
+            colorChar('▲', RED);
+            break;
+          case PLAIN:
+            colorChar('.', BRIGHT_GREEN);
+            break;
+          }
         }
       }
-    } else
-
-    {
+    } else {
       return false;
     }
     return true;
@@ -260,7 +264,7 @@ public class Screen {
     out.print("\u001b[" + n + "A");
   }
 
-  protected void resetCursor() {
+  protected void reset() {
     moveUp(height - 1);
     moveLeft(width);
   }

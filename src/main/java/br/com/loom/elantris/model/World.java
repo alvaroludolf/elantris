@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.com.loom.elantris.TextResourceManager;
 import br.com.loom.elantris.model.character.Direction;
 import br.com.loom.elantris.model.character.NPC;
 import br.com.loom.elantris.model.site.Site;
 import br.com.loom.elantris.model.site.SiteType;
+import br.com.loom.elantris.repositories.TextRepository;
 
 public class World implements Serializable {
 
@@ -21,7 +21,7 @@ public class World implements Serializable {
   private int totalChance = 0;
 
   public World() {
-    String[] monsterList = TextResourceManager.instance().readResource("monsters.txt");
+    String[] monsterList = TextRepository.instance().readResource("monsters.txt");
     for (String monster : monsterList) {
       if (!monster.startsWith("#")) {
         MonsterSpec spec = new MonsterSpec(monster);
@@ -32,7 +32,7 @@ public class World implements Serializable {
   }
 
   public void addMonster(Site site) {
-    if (Math.random() < .05) {
+    if (site != null && Math.random() < .05) {
       int monsterRandom = (int) (Math.random() * totalChance);
       for (MonsterSpec spec : specs) {
         monsterRandom -= spec.getChance();
@@ -46,11 +46,11 @@ public class World implements Serializable {
     }
   }
 
-  public List<NPC> getNpcs() {
+  public List<NPC> npcs() {
     return npcs;
   }
 
-  public long getTime() {
+  public long time() {
     return time;
   }
 

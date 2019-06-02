@@ -1,1 +1,1 @@
-@java -jar lib/elantris.jar
+@java -jar lib/elantris-0.0.1-SNAPSHOT.jar

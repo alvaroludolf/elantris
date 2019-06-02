@@ -7,6 +7,7 @@ import br.com.loom.elantris.model.site.Site;
 
 public abstract class Persona implements Interactable, Serializable {
 
+  protected String name;
   protected Site site;
   protected Direction direction;
   protected long xp;
@@ -14,36 +15,6 @@ public abstract class Persona implements Interactable, Serializable {
   protected int hp;
   protected int mpMax;
   protected int mp;
-  protected String name;
-
-  public Direction getDirection() {
-    return direction;
-  }
-
-  public int getHp() {
-    return hp;
-  }
-
-  public int getHpMax() {
-    return hpMax;
-  }
-
-  public int getMp() {
-    return mp;
-  }
-
-  public int getMpMax() {
-    return mpMax;
-  }
-
-  public Site getSite() {
-    return site;
-  }
-
-  public long getXp() {
-    return xp;
-  }
-
   public void dropAt(Site site, Direction direction) {
     this.site = site;
     this.direction = direction;
@@ -51,9 +22,11 @@ public abstract class Persona implements Interactable, Serializable {
   }
 
   public void move(Site to) {
-    site.leave(this);
-    to.enter(this);
-    this.site = to;
+    if (to != null) {
+      site.leave(this);
+      to.enter(this);
+      this.site = to;
+    }
   }
 
   public void moveBackward() {
@@ -74,20 +47,6 @@ public abstract class Persona implements Interactable, Serializable {
     turnRight();
     moveForward();
     turnLeft();
-  }
-
-  public void setHpMax(int hpMax) {
-    this.hp = hpMax;
-    this.hpMax = hpMax;
-  }
-
-  public void setMpMax(int mpMax) {
-    this.mp = mpMax;
-    this.mpMax = mpMax;
-  }
-
-  public void setXp(long xp) {
-    this.xp = xp;
   }
 
   public void turnLeft() {
@@ -122,20 +81,71 @@ public abstract class Persona implements Interactable, Serializable {
     }
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public void takeDamage(int attack) {
     setHp(hp - attack);
   }
 
   public void healDamage(int heal) {
     setHp(hp + heal);
+  }
+
+  public boolean isDead() {
+    return hp <= 0;
+  }
+
+  public Direction direction() {
+    return direction;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public int getHp() {
+    return hp;
+  }
+
+  public int getHpMax() {
+    return hpMax;
+  }
+
+  public int getMp() {
+    return mp;
+  }
+
+  public int getMpMax() {
+    return mpMax;
+  }
+
+  public Site getSite() {
+    return site;
+  }
+
+  public long getXp() {
+    return xp;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setHpMax(int hpMax) {
+    this.hp = hpMax;
+    this.hpMax = hpMax;
+  }
+
+  public void setMpMax(int mpMax) {
+    this.mp = mpMax;
+    this.mpMax = mpMax;
+  }
+
+  public void setXp(long xp) {
+    this.xp = xp;
+  }
+
+  @Override
+  public String toString() {
+    return "Persona [site=" + site + ", name=" + name + "]";
   }
 
   protected void setHp(int hp) {
@@ -156,15 +166,6 @@ public abstract class Persona implements Interactable, Serializable {
     } else {
       this.mp = mp;
     }
-  }
-
-  public boolean isDead() {
-    return hp <= 0;
-  }
-
-  @Override
-  public String toString() {
-    return "Persona [site=" + site + ", name=" + name + "]";
   }
 
 }

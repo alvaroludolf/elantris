@@ -1,4 +1,4 @@
-package br.com.loom.elantris;
+package br.com.loom.elantris.helper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class Log {
 
-  private static PrintWriter pw;
+  public static PrintWriter pw;
 
   static {
     try {
@@ -21,8 +21,10 @@ public class Log {
     pw.flush();
   }
 
-  public static PrintWriter printWriter() {
-    return pw;
+  public static void log(Throwable e) {
+    log(e.getMessage());
+    e.printStackTrace(pw);
+    pw.flush();
   }
 
 }

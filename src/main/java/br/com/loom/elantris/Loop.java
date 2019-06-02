@@ -3,6 +3,7 @@ package br.com.loom.elantris;
 import java.util.LinkedList;
 import java.util.List;
 
+import br.com.loom.elantris.behaviour.NpcResolver;
 import br.com.loom.elantris.model.Action;
 import br.com.loom.elantris.model.World;
 import br.com.loom.elantris.model.character.NPC;
@@ -10,29 +11,31 @@ import br.com.loom.elantris.model.character.PC;
 
 public class Loop {
 
-  private NpcActionResolver resolver = new NpcActionResolver();
-  private Elantris elantris;
+  protected NpcResolver npcResolver;
+  protected Elantris elantris;
 
   public Loop(Elantris elantris) {
     this.elantris = elantris;
+    this.npcResolver = new NpcResolver();
   }
 
   public void tick(Action pcActions) {
 
-    World world = elantris.world();
-    PC pc = elantris.pc();
-
     if (pcActions != null) {
 
+      World world = elantris.world();
+      PC pc = elantris.pc();
+
       List<Action> npcActions = new LinkedList<>();
-      List<NPC> npcs = world.getNpcs();
+      List<NPC> npcs = world.npcs();
       for (NPC npc : npcs) {
-        Action action = resolver.resolve(npc);
+        Action action = npcResolver.resolve(npc);
         if (action != null) {
           npcActions.add(action);
         }
       }
 
+      world.tick();
       pcActions.act();
       for (Action action : npcActions) {
         if (action != null)
@@ -45,15 +48,6 @@ public class Loop {
         elantris.pc(null);
       }
     }
-    if (pc == null || (pc.complete() && pc.isDead())) {
-      elantris.setHelp(TextResourceManager.instance().readResource("createHelp.ans"));
-    } else if (pc != null && pc.complete() && !pc.isDead()) {
-      elantris.setHelp(TextResourceManager.instance().readResource("playHelp.ans"));
-    } else {
-      elantris.setHelp("");
-    }
-
-    world.tick();
 
   }
 

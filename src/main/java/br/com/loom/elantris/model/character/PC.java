@@ -5,26 +5,6 @@ public class PC extends Persona {
   private Classe classe;
   private Race race;
 
-  public boolean complete() {
-    return name != null && classe != null && race != null;
-  }
-
-  public Classe getClasse() {
-    return classe;
-  }
-
-  public Race getRace() {
-    return race;
-  }
-
-  public void setClasse(Classe classe) {
-    this.classe = classe;
-  }
-
-  public void setRace(Race race) {
-    this.race = race;
-  }
-
   public int attack(Persona p) {
     if (p != null) {
       int damage = classe.attack();
@@ -50,13 +30,6 @@ public class PC extends Persona {
     return 0;
   }
 
-  public int rest() {
-    int timeToRest = Math.max(getMpMax() - getMp(), getHpMax() - getHp());
-    setHp(Integer.MAX_VALUE);
-    setMp(Integer.MAX_VALUE);
-    return timeToRest;
-  }
-
   public int heal(Persona p) {
     if (mp >= 5) {
       setMp(mp - 5);
@@ -67,6 +40,33 @@ public class PC extends Persona {
       }
     }
     return 0;
+  }
+
+  public int rest() {
+    int timeToRest = Math.max(getMpMax() - getMp(), getHpMax() - getHp());
+    setHp(Integer.MAX_VALUE);
+    setMp(Integer.MAX_VALUE);
+    return timeToRest;
+  }
+
+  public boolean complete() {
+    return name != null && classe != null && race != null;
+  }
+
+  public Classe getClasse() {
+    return classe;
+  }
+
+  public Race getRace() {
+    return race;
+  }
+
+  public void setClasse(Classe classe) {
+    this.classe = classe;
+  }
+
+  public void setRace(Race race) {
+    this.race = race;
   }
 
 }

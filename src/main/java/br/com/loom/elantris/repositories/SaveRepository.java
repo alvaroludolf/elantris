@@ -1,4 +1,4 @@
-package br.com.loom.elantris;
+package br.com.loom.elantris.repositories;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,18 +8,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 
+import br.com.loom.elantris.Elantris;
 import br.com.loom.elantris.model.World;
 import br.com.loom.elantris.model.character.PC;
 
 public class SaveRepository {
 
+  File directory;
+
+  public SaveRepository(File directory) {
+    this.directory = directory;
+  }
+
   public void save(Elantris elantris) throws IOException {
-    File p = new File("save");
-    if (!p.exists())
-      p.mkdirs();
-    File f = new File(p, "savegame.sav");
+    if (!directory.exists())
+      directory.mkdirs();
+    File f = new File(directory, "savegame.sav");
     if (f.exists()) {
-      try (FileOutputStream out = new FileOutputStream(new File(p, "savegame.bak"))) {
+      try (FileOutputStream out = new FileOutputStream(new File(directory, "savegame.bak"))) {
         Files.copy(f.toPath(), out);
       }
     }
@@ -30,7 +36,7 @@ public class SaveRepository {
   }
 
   public void load(Elantris elantris) throws IOException {
-    File f = new File("save", "savegame.sav");
+    File f = new File(directory, "savegame.sav");
     if (f.exists()) {
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f))) {
         try {
