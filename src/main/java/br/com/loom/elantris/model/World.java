@@ -3,6 +3,7 @@ package br.com.loom.elantris.model;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import br.com.loom.elantris.model.character.Direction;
 import br.com.loom.elantris.model.character.NPC;
@@ -19,6 +20,8 @@ public class World implements Serializable {
   private List<NPC> npcs = new LinkedList<>();
   private List<MonsterSpec> specs = new LinkedList<>();
   private int totalChance = 0;
+  
+  Random r = new Random();
 
   public World() {
     String[] monsterList = TextRepository.instance().readResource("monsters.txt");
@@ -31,19 +34,20 @@ public class World implements Serializable {
     }
   }
 
-  public void addMonster(Site site) {
-    if (site != null && Math.random() < .05) {
-      int monsterRandom = (int) (Math.random() * totalChance);
+  public NPC addMonster(Site site) {
+    if (site != null && r.nextDouble() < .05) {
+      int monsterRandom = (int) (r.nextDouble() * totalChance);
       for (MonsterSpec spec : specs) {
         monsterRandom -= spec.getChance();
         if (monsterRandom < 0) {
           NPC npc = new NPC(spec);
           npc.dropAt(site, Direction.NORTH);
           npcs.add(npc);
-          return;
+          return npc;
         }
       }
     }
+    return null;
   }
 
   public List<NPC> npcs() {
@@ -88,11 +92,11 @@ public class World implements Serializable {
       if (nearby[i] > nearby[winner])
         winner = i;
       else if (nearby[i] > nearby[winner])
-        if (Math.random() < .5)
+        if (r.nextDouble() < .5)
           winner = i;
     }
-    if (Math.random() < .1) {
-      winner = (int) (Math.random() * SITE_VARIANCE);
+    if (r.nextDouble() < .1) {
+      winner = (int) (r.nextDouble() * SITE_VARIANCE);
     }
     type = SiteType.values()[winner];
     return type;

@@ -21,15 +21,15 @@ public enum Classe {
   }
 
   public int attack() {
-    return (int) (Math.random() * (attack + 1));
+    return 1 + (int) (Math.random() * (attack));
   }
 
   public int heal() {
-    return heal + (int) (Math.random() * (heal + 1));
+    return 1 + heal + (int) (Math.random() * (heal));
   }
 
   public int spell() {
-    return (spell / 2) + (int) (Math.random() * (spell + 1));
+    return 1 + (spell / 2) + (int) (Math.random() * (spell));
   }
 
   public int maxHp() {
