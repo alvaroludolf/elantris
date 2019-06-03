@@ -55,17 +55,17 @@ public class CommandResolver {
           actor.moveRight();
         };
       } else if ("1".equals(cmd)) {
-        if (!npc.isDead())
+        if (npc != null && !npc.isDead())
           return () -> {
             actor.attack((Persona) npc);
           };
       } else if ("2".equals(cmd)) {
-        if (!npc.isDead())
+        if (npc != null && !npc.isDead())
           return () -> {
             actor.cast((Persona) npc);
           };
       } else if ("3".equals(cmd)) {
-        if (!npc.isDead())
+        if (npc != null && !npc.isDead())
           return () -> {
             actor.heal((Persona) actor);
           };
